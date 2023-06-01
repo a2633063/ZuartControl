@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZuartControl", "ZuartControl\ZuartControl.csproj", "{6C8CF26A-8362-4784-AED3-0A7C29BC95F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZuartControl", "ZuartControl.csproj", "{6C8CF26A-8362-4784-AED3-0A7C29BC95F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
