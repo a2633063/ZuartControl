@@ -148,6 +148,7 @@ namespace ZuartControl
         public class ComData_EventArgs : EventArgs
         {
             public byte[] data { get; set; }
+            public string recived_string { get; set; }
         }
         protected EventHandler<ComData_EventArgs> OnComDataReceived;
         [Category("控件事件"), Description("串口接收到数据后调用"), Browsable(true)]
@@ -732,9 +733,10 @@ namespace ZuartControl
             this.BeginInvoke(new MethodInvoker(delegate
             {
                 RevCount += (UInt64)ReDatas.Length;
-                this.AddData(ReDatas);//输出数据
+                string str=this.AddData(ReDatas);//输出数据
                 ComData_EventArgs comDataReceived_EventArgs = new ComData_EventArgs();
                 comDataReceived_EventArgs.data = ReDatas;
+                comDataReceived_EventArgs.recived_string = str;
                 if (OnComDataReceived != null) OnComDataReceived(this, comDataReceived_EventArgs);
             }));
         }
@@ -801,8 +803,9 @@ namespace ZuartControl
         }
         #endregion
         #region 接收文本框字符处理
-        public void AddData(byte[] data)
+        public string Byte2String(byte[] data)
         {
+            string str;
             if (rbtnHex.Checked)
             {
                 StringBuilder sb = new StringBuilder();
@@ -810,22 +813,29 @@ namespace ZuartControl
                 {
                     sb.AppendFormat("{0:x2}" + " ", data[i]);
                 }
-                AddContent(sb.ToString().ToUpper());
+                str = sb.ToString().ToUpper();
             }
             else if (rbtnUTF8.Checked)
             {
-                AddContent(new UTF8Encoding().GetString(data));
+                str = new UTF8Encoding().GetString(data);
             }
             else if (rbtnUnicode.Checked)
             {
-                AddContent(new UnicodeEncoding().GetString(data));
+                str = new UnicodeEncoding().GetString(data);
             }
             else// if (rbtnASCII.Checked)
             {
+                str = Encoding.GetEncoding("GBK").GetString(data);
                 //AddContent(new ASCIIEncoding().GetString(data));
-                AddContent(Encoding.GetEncoding("GBK").GetString(data));
             }
-
+            return str;
+        }
+        public string AddData(byte[] data)
+        {
+            string str;
+            str = Byte2String(data);
+            AddContent(str);
+            return str;
         }
 
 
