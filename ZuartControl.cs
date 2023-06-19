@@ -48,27 +48,25 @@ namespace ZuartControl
             }
         }
 
-
-
-        private TextBox txtShowData;
-        [Category("控件绑定"), Description("设置接收文本的TextBox"), Browsable(true)]
-        public TextBox TextBoxShowData
+        private RichTextBox rtxShowData;
+        [Category("控件绑定"), Description("设置接收文本的RichTextBox"), Browsable(true)]
+        public RichTextBox RichTextBoxShowData
         {
             get
             {
-                return txtShowData;
+                return rtxShowData;
             }
             set
             {
-                txtShowData = value;
-                if (txtShowData != null)
+                rtxShowData = value;
+                if (rtxShowData != null)
                 {
-                    txtShowData.AcceptsTab = true;
-                    txtShowData.KeyPress += txtShowData_KeyPress;
+                    rtxShowData.HideSelection = true;
+                    rtxShowData.AcceptsTab = true;
+                    rtxShowData.KeyPress += txtShowData_KeyPress;
                 }
             }
         }
-
         private TextBox txtSendData;
         [Category("控件绑定"), Description("设置发送文本的TextBox"), Browsable(true)]
         public TextBox TextBoxSendData
@@ -435,11 +433,13 @@ namespace ZuartControl
 
                 if (chkShowTime.Checked)
                 {
-                    if (txtShowData.Text.Length > 0)
+                    if (rtxShowData.Text.Length > 0)
                     {
-                        txtShowData.AppendText("\r\n");
+                        rtxShowData.AppendText("\r\n");
                     }
-                    txtShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send file:" + "\r\n发送文件数据源:" + SendFileName);
+                    rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
+                    rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send file:" + "\r\n发送文件数据源:" + SendFileName);
+                    if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
                 }
                 return;
             }
@@ -500,11 +500,15 @@ namespace ZuartControl
 
                     if (chkShowTime.Checked)
                     {
-                        if (txtShowData.Text.Length > 0)
+                        if (rtxShowData.Text.Length > 0)
                         {
-                            txtShowData.AppendText("\r\n");
+                            rtxShowData.AppendText("\r\n");
                         }
-                        txtShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Hex:" + "\r\n" + str.Trim());
+                        rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
+                        rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Hex:" + "\r\n" );
+                        rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
+                        rtxShowData.AppendText(str.Trim());
+                        if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
                     }
 
                 }
@@ -519,11 +523,15 @@ namespace ZuartControl
             {
                 if (chkShowTime.Checked)
                 {
-                    if (txtShowData.Text.Length > 0)
+                    if (rtxShowData.Text.Length > 0)
                     {
-                        txtShowData.AppendText("\r\n");
+                        rtxShowData.AppendText("\r\n");
                     }
-                    txtShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Str:" + "\r\n" + str);
+                    rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
+                    rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Str:" + "\r\n");
+                    rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
+                    rtxShowData.AppendText(str);
+                    if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
                 }
 
                 #region 转义字符的处理
@@ -803,6 +811,7 @@ namespace ZuartControl
         #region 接收文本框字符处理
         public void AddData(byte[] data)
         {
+            if (chkIsShow.Checked) return;
             if (rbtnHex.Checked)
             {
                 StringBuilder sb = new StringBuilder();
@@ -841,30 +850,27 @@ namespace ZuartControl
             //this.BeginInvoke(new MethodInvoker(delegate
             //{
             string str = "";
-            if (txtShowData == null) return;
+            if (rtxShowData == null) return;
 
-            if (chkAutoLine.Checked && txtShowData.Text.Length > 0 && isChkAutoLine)
+            if (chkAutoLine.Checked && rtxShowData.Text.Length > 0 && isChkAutoLine)
             {
-                str = "\r\n";
-                //txtShowData.AppendText("\r\n");
+                //str = "\r\n";
+                rtxShowData.AppendText("\r\n");
             }
 
             if (chkShowTime.Checked)
             {
-                str += " [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Rec:" + "\r\n";
-                //txtShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "]" + "\r\n");
+                //str += " [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Rec:" + "\r\n";
+                rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
+                rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "]" + "\r\n");
             }
 
+            rtxShowData.SelectionColor = Color.FromArgb(0X008000);
             str += content;
-            if (chkAutoScroll.Checked)
-            {
-                txtShowData.AppendText(str);
-            }
-            else
-            {
-                txtShowData.Text += str;
-            }
 
+            rtxShowData.AppendText(str);
+            if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
+            
             //}));
         }
         #endregion
@@ -872,8 +878,8 @@ namespace ZuartControl
         #region 清空接收区
         private void lkbClearRev_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            if (txtShowData != null)
-                txtShowData.Clear();
+            if (rtxShowData != null)
+                rtxShowData.Clear();
         }
         #endregion
         #region 清空发送
@@ -903,12 +909,12 @@ namespace ZuartControl
         #region 保存数据
         private void lkbSaveRev_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            //if (txtShowData.Text.Length < 1)
+            //if (rtxShowData.Text.Length < 1)
             //{
             //    MessageBox("");
             //    return;
             //}
-            if (txtShowData == null) return;
+            if (rtxShowData == null) return;
             StreamWriter myStream;
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             saveFileDialog1.Filter = "文本文档(*.txt)|*.txt|所有文件(*.*)|*.*";
@@ -917,7 +923,7 @@ namespace ZuartControl
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 myStream = new StreamWriter(saveFileDialog1.FileName);
-                myStream.Write(txtShowData.Text); //写入
+                myStream.Write(rtxShowData.Text); //写入
                 myStream.Close();//关闭流
             }
         }
