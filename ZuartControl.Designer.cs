@@ -201,7 +201,7 @@
             // rbtnSendUnicode
             // 
             this.rbtnSendUnicode.AutoSize = true;
-            this.rbtnSendUnicode.Location = new System.Drawing.Point(70, 136);
+            this.rbtnSendUnicode.Location = new System.Drawing.Point(70, 132);
             this.rbtnSendUnicode.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnSendUnicode.Name = "rbtnSendUnicode";
             this.rbtnSendUnicode.Size = new System.Drawing.Size(65, 16);
@@ -239,7 +239,7 @@
             // rbtnSendUTF8
             // 
             this.rbtnSendUTF8.AutoSize = true;
-            this.rbtnSendUTF8.Location = new System.Drawing.Point(13, 136);
+            this.rbtnSendUTF8.Location = new System.Drawing.Point(13, 132);
             this.rbtnSendUTF8.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnSendUTF8.Name = "rbtnSendUTF8";
             this.rbtnSendUTF8.Size = new System.Drawing.Size(53, 16);
@@ -252,10 +252,10 @@
             // 
             this.lkbSendKey.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lkbSendKey.Font = new System.Drawing.Font("宋体", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lkbSendKey.Location = new System.Drawing.Point(4, 171);
+            this.lkbSendKey.Location = new System.Drawing.Point(4, 175);
             this.lkbSendKey.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lkbSendKey.Name = "lkbSendKey";
-            this.lkbSendKey.Size = new System.Drawing.Size(145, 15);
+            this.lkbSendKey.Size = new System.Drawing.Size(145, 11);
             this.lkbSendKey.TabIndex = 10;
             this.lkbSendKey.TabStop = true;
             this.lkbSendKey.Text = "Enter发送,Ctrl+Enter换行";
