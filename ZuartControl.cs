@@ -757,10 +757,12 @@ namespace ZuartControl
                 //if ((e.KeyChar >= ' ' && e.KeyChar <= '~') || e.KeyChar == '\r')//这是允许输入退格键允许输入0-9数字
                 //{
                 SendStr(e.KeyChar.ToString(), false);
-
+                e.Handled = true;
                 //}
+            }else
+            {
+                e.Handled = false;
             }
-            e.Handled = true;
         }
         #endregion
         #region 发送文本框,输入监听,供设置发送/换行按键
