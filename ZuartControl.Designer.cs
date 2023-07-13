@@ -13,8 +13,6 @@
         /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
         protected override void Dispose(bool disposing)
         {
-            System.Diagnostics.Debug.WriteLine("Dispose");
-            setting_save(null, null);
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -47,6 +45,7 @@
             this.lkbSendKey = new System.Windows.Forms.LinkLabel();
             this.lkbClearSend = new System.Windows.Forms.LinkLabel();
             this.groupboxRecSetting = new System.Windows.Forms.GroupBox();
+            this.chkIsShow = new System.Windows.Forms.CheckBox();
             this.chkAutoScroll = new System.Windows.Forms.CheckBox();
             this.chkRecSend = new System.Windows.Forms.CheckBox();
             this.lkbSaveRev = new System.Windows.Forms.LinkLabel();
@@ -79,7 +78,7 @@
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.chkIsShow = new System.Windows.Forms.CheckBox();
+            this.timerDelay = new System.Windows.Forms.Timer(this.components);
             this.panel_Setting.SuspendLayout();
             this.groupboxSendSetting.SuspendLayout();
             this.groupboxRecSetting.SuspendLayout();
@@ -134,7 +133,7 @@
             this.chkfromFileSend.Margin = new System.Windows.Forms.Padding(4);
             this.chkfromFileSend.Name = "chkfromFileSend";
             this.chkfromFileSend.Size = new System.Drawing.Size(108, 16);
-            this.chkfromFileSend.TabIndex = 2;
+            this.chkfromFileSend.TabIndex = 1;
             this.chkfromFileSend.Text = "打开文件数据源";
             this.chkfromFileSend.UseVisualStyleBackColor = true;
             this.chkfromFileSend.CheckedChanged += new System.EventHandler(this.chkfromFileSend_CheckedChanged);
@@ -147,7 +146,7 @@
             this.txtAutoSendms.MaxLength = 5;
             this.txtAutoSendms.Name = "txtAutoSendms";
             this.txtAutoSendms.Size = new System.Drawing.Size(41, 21);
-            this.txtAutoSendms.TabIndex = 5;
+            this.txtAutoSendms.TabIndex = 4;
             this.txtAutoSendms.Text = "500";
             this.txtAutoSendms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.toolTip1.SetToolTip(this.txtAutoSendms, "建议20-60000范围内");
@@ -171,7 +170,7 @@
             this.chkAutoSend.Margin = new System.Windows.Forms.Padding(4);
             this.chkAutoSend.Name = "chkAutoSend";
             this.chkAutoSend.Size = new System.Drawing.Size(96, 16);
-            this.chkAutoSend.TabIndex = 4;
+            this.chkAutoSend.TabIndex = 5;
             this.chkAutoSend.Text = "发送周期(ms)";
             this.chkAutoSend.UseVisualStyleBackColor = true;
             // 
@@ -182,7 +181,7 @@
             this.chkTrans.Margin = new System.Windows.Forms.Padding(4);
             this.chkTrans.Name = "chkTrans";
             this.chkTrans.Size = new System.Drawing.Size(96, 16);
-            this.chkTrans.TabIndex = 1;
+            this.chkTrans.TabIndex = 0;
             this.chkTrans.Text = "转义字符处理";
             this.chkTrans.UseVisualStyleBackColor = true;
             // 
@@ -269,7 +268,7 @@
             this.lkbClearSend.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lkbClearSend.Name = "lkbClearSend";
             this.lkbClearSend.Size = new System.Drawing.Size(53, 12);
-            this.lkbClearSend.TabIndex = 11;
+            this.lkbClearSend.TabIndex = 10;
             this.lkbClearSend.TabStop = true;
             this.lkbClearSend.Text = "清除发送";
             this.lkbClearSend.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbClearSend_LinkClicked);
@@ -298,6 +297,17 @@
             this.groupboxRecSetting.TabStop = false;
             this.groupboxRecSetting.Text = "接收区设置";
             // 
+            // chkIsShow
+            // 
+            this.chkIsShow.AutoSize = true;
+            this.chkIsShow.Location = new System.Drawing.Point(15, 81);
+            this.chkIsShow.Margin = new System.Windows.Forms.Padding(4);
+            this.chkIsShow.Name = "chkIsShow";
+            this.chkIsShow.Size = new System.Drawing.Size(108, 16);
+            this.chkIsShow.TabIndex = 4;
+            this.chkIsShow.Text = "接收数据不显示";
+            this.chkIsShow.UseVisualStyleBackColor = true;
+            // 
             // chkAutoScroll
             // 
             this.chkAutoScroll.AutoSize = true;
@@ -307,7 +317,7 @@
             this.chkAutoScroll.Margin = new System.Windows.Forms.Padding(4);
             this.chkAutoScroll.Name = "chkAutoScroll";
             this.chkAutoScroll.Size = new System.Drawing.Size(72, 16);
-            this.chkAutoScroll.TabIndex = 6;
+            this.chkAutoScroll.TabIndex = 3;
             this.chkAutoScroll.Text = "自动滚屏";
             this.chkAutoScroll.UseVisualStyleBackColor = true;
             // 
@@ -318,7 +328,7 @@
             this.chkRecSend.Margin = new System.Windows.Forms.Padding(4);
             this.chkRecSend.Name = "chkRecSend";
             this.chkRecSend.Size = new System.Drawing.Size(96, 16);
-            this.chkRecSend.TabIndex = 5;
+            this.chkRecSend.TabIndex = 2;
             this.chkRecSend.Text = "输入直接发送";
             this.chkRecSend.UseVisualStyleBackColor = true;
             // 
@@ -329,7 +339,7 @@
             this.lkbSaveRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lkbSaveRev.Name = "lkbSaveRev";
             this.lkbSaveRev.Size = new System.Drawing.Size(53, 12);
-            this.lkbSaveRev.TabIndex = 11;
+            this.lkbSaveRev.TabIndex = 9;
             this.lkbSaveRev.TabStop = true;
             this.lkbSaveRev.Text = "保存数据";
             this.lkbSaveRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbSaveRev_LinkClicked);
@@ -341,7 +351,7 @@
             this.rbtnUnicode.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnUnicode.Name = "rbtnUnicode";
             this.rbtnUnicode.Size = new System.Drawing.Size(65, 16);
-            this.rbtnUnicode.TabIndex = 10;
+            this.rbtnUnicode.TabIndex = 8;
             this.rbtnUnicode.Text = "Unicode";
             this.rbtnUnicode.UseVisualStyleBackColor = true;
             this.rbtnUnicode.Click += new System.EventHandler(this.rbtn_Click);
@@ -353,7 +363,7 @@
             this.rbtnUTF8.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnUTF8.Name = "rbtnUTF8";
             this.rbtnUTF8.Size = new System.Drawing.Size(53, 16);
-            this.rbtnUTF8.TabIndex = 9;
+            this.rbtnUTF8.TabIndex = 7;
             this.rbtnUTF8.Text = "UTF-8";
             this.rbtnUTF8.UseVisualStyleBackColor = true;
             this.rbtnUTF8.Click += new System.EventHandler(this.rbtn_Click);
@@ -366,7 +376,7 @@
             this.rbtnASCII.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnASCII.Name = "rbtnASCII";
             this.rbtnASCII.Size = new System.Drawing.Size(41, 16);
-            this.rbtnASCII.TabIndex = 8;
+            this.rbtnASCII.TabIndex = 6;
             this.rbtnASCII.TabStop = true;
             this.rbtnASCII.Text = "GBK";
             this.rbtnASCII.UseVisualStyleBackColor = true;
@@ -379,7 +389,7 @@
             this.rbtnHex.Margin = new System.Windows.Forms.Padding(4);
             this.rbtnHex.Name = "rbtnHex";
             this.rbtnHex.Size = new System.Drawing.Size(41, 16);
-            this.rbtnHex.TabIndex = 7;
+            this.rbtnHex.TabIndex = 5;
             this.rbtnHex.Text = "Hex";
             this.rbtnHex.UseVisualStyleBackColor = true;
             this.rbtnHex.Click += new System.EventHandler(this.rbtn_Click);
@@ -391,7 +401,7 @@
             this.lkbClearRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lkbClearRev.Name = "lkbClearRev";
             this.lkbClearRev.Size = new System.Drawing.Size(53, 12);
-            this.lkbClearRev.TabIndex = 12;
+            this.lkbClearRev.TabIndex = 10;
             this.lkbClearRev.TabStop = true;
             this.lkbClearRev.Text = "清除接收";
             this.lkbClearRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbClearRev_LinkClicked);
@@ -403,7 +413,7 @@
             this.chkShowTime.Margin = new System.Windows.Forms.Padding(4);
             this.chkShowTime.Name = "chkShowTime";
             this.chkShowTime.Size = new System.Drawing.Size(96, 16);
-            this.chkShowTime.TabIndex = 4;
+            this.chkShowTime.TabIndex = 1;
             this.chkShowTime.Text = "日志模式显示";
             this.chkShowTime.UseVisualStyleBackColor = true;
             this.chkShowTime.CheckedChanged += new System.EventHandler(this.chkShowTime_CheckedChanged);
@@ -415,7 +425,7 @@
             this.chkAutoLine.Margin = new System.Windows.Forms.Padding(4);
             this.chkAutoLine.Name = "chkAutoLine";
             this.chkAutoLine.Size = new System.Drawing.Size(96, 16);
-            this.chkAutoLine.TabIndex = 3;
+            this.chkAutoLine.TabIndex = 0;
             this.chkAutoLine.Text = "自动换行显示";
             this.chkAutoLine.UseVisualStyleBackColor = true;
             // 
@@ -456,7 +466,7 @@
             this.chkDTR.Margin = new System.Windows.Forms.Padding(4);
             this.chkDTR.Name = "chkDTR";
             this.chkDTR.Size = new System.Drawing.Size(47, 18);
-            this.chkDTR.TabIndex = 1;
+            this.chkDTR.TabIndex = 7;
             this.chkDTR.Text = "DTR";
             this.chkDTR.UseVisualStyleBackColor = true;
             this.chkDTR.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
@@ -471,7 +481,7 @@
             this.chkRTS.Margin = new System.Windows.Forms.Padding(4);
             this.chkRTS.Name = "chkRTS";
             this.chkRTS.Size = new System.Drawing.Size(47, 18);
-            this.chkRTS.TabIndex = 2;
+            this.chkRTS.TabIndex = 6;
             this.chkRTS.Text = "RTS";
             this.chkRTS.UseVisualStyleBackColor = true;
             this.chkRTS.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
@@ -480,7 +490,6 @@
             // 
             this.cbbParity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbParity.FormattingEnabled = true;
             this.cbbParity.Items.AddRange(new object[] {
             "None",
             "Odd",
@@ -498,7 +507,6 @@
             // 
             this.cbbStopBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbStopBits.FormattingEnabled = true;
             this.cbbStopBits.Items.AddRange(new object[] {
             "1",
             "2",
@@ -523,7 +531,7 @@
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
             this.btnOpen.Size = new System.Drawing.Size(146, 41);
-            this.btnOpen.TabIndex = 6;
+            this.btnOpen.TabIndex = 8;
             this.btnOpen.Text = " 打开串口";
             this.btnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnOpen.UseVisualStyleBackColor = true;
@@ -533,7 +541,6 @@
             // 
             this.cbbDataBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbDataBits.FormattingEnabled = true;
             this.cbbDataBits.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.cbbDataBits.Items.AddRange(new object[] {
             "8",
@@ -544,6 +551,7 @@
             this.cbbDataBits.Name = "cbbDataBits";
             this.cbbDataBits.Size = new System.Drawing.Size(93, 21);
             this.cbbDataBits.TabIndex = 3;
+            this.cbbDataBits.Text = "8";
             this.cbbDataBits.TextChanged += new System.EventHandler(this.cbbComSetChange);
             // 
             // cbbBaudRate
@@ -700,16 +708,10 @@
             this.toolStripMenuItem4.CheckStateChanged += new System.EventHandler(this.toolStripMenuItem_CheckStateChanged);
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
-            // chkIsShow
+            // timerDelay
             // 
-            this.chkIsShow.AutoSize = true;
-            this.chkIsShow.Location = new System.Drawing.Point(15, 81);
-            this.chkIsShow.Margin = new System.Windows.Forms.Padding(4);
-            this.chkIsShow.Name = "chkIsShow";
-            this.chkIsShow.Size = new System.Drawing.Size(108, 16);
-            this.chkIsShow.TabIndex = 6;
-            this.chkIsShow.Text = "接收数据不显示";
-            this.chkIsShow.UseVisualStyleBackColor = true;
+            this.timerDelay.Enabled = true;
+            this.timerDelay.Tick += new System.EventHandler(this.timerDelay_Tick);
             // 
             // ZuartControl
             // 
@@ -780,5 +782,6 @@
         public System.Windows.Forms.RadioButton rbtnSendUTF8;
         public System.Windows.Forms.TextBox txtAutoSendms;
         private System.Windows.Forms.CheckBox chkIsShow;
+        private System.Windows.Forms.Timer timerDelay;
     }
 }

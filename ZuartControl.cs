@@ -12,10 +12,11 @@ using System.IO.Ports;
 using System.IO;
 using TextBox = System.Windows.Forms.TextBox;
 using Button = System.Windows.Forms.Button;
+using System.Configuration;
 
 namespace ZuartControl
 {
-    public partial class ZuartControl: UserControl
+    public partial class ZuartControl : UserControl
     {
 
 
@@ -80,7 +81,8 @@ namespace ZuartControl
                 txtSendData = value;
                 if (txtSendData == null) return;
                 //txtSendData.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "txtSendData", true, DataSourceUpdateMode.OnPropertyChanged));
-
+                IniFile ini = new IniFile(IniPath);
+                txtSendData.Text = ini.Read("txtSendData", "COM") ?? "";
                 // txtSendData.AcceptsTab = true;
                 txtSendData.KeyPress += txtSendData_KeyPress;
                 txtSendData.KeyDown += txtSendData_KeyDown;
@@ -110,6 +112,21 @@ namespace ZuartControl
             }
         }
 
+
+        private string iniFileName;
+        [Category("控件绑定"), Description("设置保存ini文件名称"), Browsable(true)]
+        public string INIFileName
+        {
+            get
+            {
+                return iniFileName;
+            }
+            set
+            {
+                iniFileName = value;
+                if (!iniFileName.EndsWith(".ini")) iniFileName += ".ini";
+            }
+        }
         #endregion
 
 
@@ -206,6 +223,9 @@ namespace ZuartControl
                 return ComDevice.IsOpen;
             }
         }
+        private string IniPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Zip", "zuartControl.ini");
+
+
         public ZuartControl()
         {
             System.Diagnostics.Debug.WriteLine("ZuartControl");
@@ -221,55 +241,91 @@ namespace ZuartControl
 
         private void init()
         {
+            if (iniFileName == null) iniFileName = "zuartControl.ini";
+            IniPath = Path.Combine(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath), iniFileName);
             #region 控件初始化
             cbbComList.Items.AddRange(SerialPort.GetPortNames());
+            if (this.ParentForm != null) this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
 
-
+            System.Diagnostics.Debug.WriteLine($"init");
             #endregion
             #region 设置保存初始化
-            cbbComList.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "cbbComList", true, DataSourceUpdateMode.OnPropertyChanged));
-            cbbBaudRate.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "cbbBaudRate", true, DataSourceUpdateMode.OnPropertyChanged));
-            cbbDataBits.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "cbbDataBits", true, DataSourceUpdateMode.OnPropertyChanged));
-            cbbStopBits.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "cbbStopBits", true, DataSourceUpdateMode.OnPropertyChanged));
-            cbbParity.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "cbbParity", true, DataSourceUpdateMode.OnPropertyChanged));
-            // txtSendData.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "txtSendData", true, DataSourceUpdateMode.OnPropertyChanged));
-            txtAutoSendms.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "txtAutoSendms", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkAutoLine.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkAutoLine", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkShowTime.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkShowTime", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkRecSend.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkRecSend", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkTrans.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkTrans", true, DataSourceUpdateMode.OnPropertyChanged));
-            //chkfromFileSend.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkfromFileSend", true, DataSourceUpdateMode.OnPropertyChanged)); 
-            chkAutoAddSend.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkAutoAddSend", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkAutoCleanSend.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkAutoCleanSend", true, DataSourceUpdateMode.OnPropertyChanged));
-            chkAutoSend.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "chkAutoSend", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnHex.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnHex", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnASCII.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnASCII", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnUTF8.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnUTF8", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnUnicode.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnUnicode", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnSendHex.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnSendHex", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnSendASCII.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnSendASCII", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnSendUTF8.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnSendUTF8", true, DataSourceUpdateMode.OnPropertyChanged));
-            rbtnSendUnicode.DataBindings.Add(new Binding("Checked", Properties.Settings.Default, "rbtnSendUnicode", true, DataSourceUpdateMode.OnPropertyChanged));
 
-            toolStripMenuItem1.CheckState = Properties.Settings.Default.menuItemSendKey1;
-            toolStripMenuItem2.CheckState = Properties.Settings.Default.menuItemSendKey2;
-            toolStripMenuItem3.CheckState = Properties.Settings.Default.menuItemSendKey3;
-            toolStripMenuItem4.CheckState = Properties.Settings.Default.menuItemSendKey4;
+            IniFile ini = new IniFile(IniPath);
 
-            if (txtSendData != null)
-                txtSendData.DataBindings.Add(new Binding("Text", Properties.Settings.Default, "txtSendData", true, DataSourceUpdateMode.OnPropertyChanged));
+            cbbComList.Text = ini.Read("cbbComList", "COM");
+            cbbBaudRate.Text = ini.Read("cbbBaudRate", "COM") ?? "115200";
+            cbbDataBits.Text = ini.Read("cbbDataBits", "COM") ?? "8";
+            cbbStopBits.Text = ini.Read("cbbStopBits", "COM") ?? "1";
+            cbbParity.Text = ini.Read("cbbParity", "COM") ?? "None";
 
+            if (txtSendData != null) txtSendData.Text = ini.Read("txtSendData", "COM") ?? "";
+            txtAutoSendms.Text = ini.Read("txtAutoSendms", "COM") ?? "100";
+
+            chkAutoLine.Checked = (ini.Read("chkAutoLine", "COM") ?? "").Equals("True");
+            chkShowTime.Checked = (ini.Read("chkShowTime", "COM") ?? "").Equals("True");
+            chkRecSend.Checked = (ini.Read("chkRecSend", "COM") ?? "").Equals("True");
+            chkTrans.Checked = (ini.Read("chkTrans", "COM") ?? "").Equals("True");
+            //chkfromFileSend.Checked = (ini.Read("chkfromFileSend", "COM") ?? "").Equals("True");
+            chkAutoAddSend.Checked = (ini.Read("chkAutoAddSend", "COM") ?? "").Equals("True");
+            chkAutoCleanSend.Checked = (ini.Read("chkAutoCleanSend", "COM") ?? "").Equals("True");
+            chkAutoSend.Checked = (ini.Read("chkAutoSend", "COM") ?? "").Equals("True");
+
+            rbtnHex.Checked = (ini.Read("rbtnHex", "COM") ?? "").Equals("True");
+            rbtnASCII.Checked = (ini.Read("rbtnASCII", "COM") ?? "True").Equals("True");
+            rbtnUTF8.Checked = (ini.Read("rbtnUTF8", "COM") ?? "").Equals("True");
+            rbtnUnicode.Checked = (ini.Read("rbtnUnicode", "COM") ?? "").Equals("True");
+            rbtnSendHex.Checked = (ini.Read("rbtnSendHex", "COM") ?? "").Equals("True");
+            rbtnSendASCII.Checked = (ini.Read("rbtnSendASCII", "COM") ?? "True").Equals("True");
+            rbtnSendUTF8.Checked = (ini.Read("rbtnSendUTF8", "COM") ?? "").Equals("True");
+            rbtnSendUnicode.Checked = (ini.Read("rbtnSendUnicode", "COM") ?? "").Equals("True");
+
+            toolStripMenuItem1.Checked = (ini.Read("toolStripMenuItem1", "COM") ?? "True").Equals("True");
+            toolStripMenuItem2.Checked = (ini.Read("toolStripMenuItem2", "COM") ?? "").Equals("True");
+            toolStripMenuItem3.Checked = (ini.Read("toolStripMenuItem3", "COM") ?? "").Equals("True");
+            toolStripMenuItem4.Checked = (ini.Read("toolStripMenuItem4", "COM") ?? "").Equals("True");
+
+            btnOpen.Focus();
             #endregion
         }
         #endregion
 
-        private void setting_save(object sender, EventArgs e)
+        public void setting_save(object sender, EventArgs e)
         {
-            Properties.Settings.Default.menuItemSendKey1 = toolStripMenuItem1.CheckState;
-            Properties.Settings.Default.menuItemSendKey2 = toolStripMenuItem2.CheckState;
-            Properties.Settings.Default.menuItemSendKey3 = toolStripMenuItem3.CheckState;
-            Properties.Settings.Default.menuItemSendKey4 = toolStripMenuItem4.CheckState;
-            Properties.Settings.Default.Save();
+            System.Diagnostics.Debug.WriteLine("setting_save");
+
+            IniFile ini = new IniFile(IniPath);
+            ini.Write("cbbComList", cbbComList.Text, "COM");
+            ini.Write("cbbBaudRate", cbbBaudRate.Text, "COM");
+            ini.Write("cbbDataBits", cbbDataBits.Text, "COM");
+            ini.Write("cbbStopBits", cbbStopBits.Text, "COM");
+            ini.Write("cbbParity", cbbParity.Text, "COM");
+
+            if (txtSendData != null) ini.Write("txtSendData", txtSendData.Text, "COM");
+            ini.Write("txtAutoSendms", txtAutoSendms.Text, "COM");
+
+            ini.Write("chkAutoLine", chkAutoLine.Checked.ToString(), "COM");
+            ini.Write("chkShowTime", chkShowTime.Checked.ToString(), "COM");
+            ini.Write("chkRecSend", chkRecSend.Checked.ToString(), "COM");
+            ini.Write("chkTrans", chkTrans.Checked.ToString(), "COM");
+            //ini.Write("chkfromFileSend",chkfromFileSend.Checked.ToString(), "COM") 
+            ini.Write("chkAutoAddSend", chkAutoAddSend.Checked.ToString(), "COM");
+            ini.Write("chkAutoCleanSend", chkAutoCleanSend.Checked.ToString(), "COM");
+            ini.Write("chkAutoSend", chkAutoSend.Checked.ToString(), "COM");
+
+            ini.Write("rbtnHex", rbtnHex.Checked.ToString(), "COM");
+            ini.Write("rbtnASCII", rbtnASCII.Checked.ToString(), "COM");
+            ini.Write("rbtnUTF8", rbtnUTF8.Checked.ToString(), "COM");
+            ini.Write("rbtnUnicode", rbtnUnicode.Checked.ToString(), "COM");
+            ini.Write("rbtnSendHex", rbtnSendHex.Checked.ToString(), "COM");
+            ini.Write("rbtnSendASCII", rbtnSendASCII.Checked.ToString(), "COM");
+            ini.Write("rbtnSendUTF8", rbtnSendUTF8.Checked.ToString(), "COM");
+            ini.Write("rbtnSendUnicode", rbtnSendUnicode.Checked.ToString(), "COM");
+
+            ini.Write("toolStripMenuItem1", toolStripMenuItem1.Checked.ToString(), "COM");
+            ini.Write("toolStripMenuItem2", toolStripMenuItem2.Checked.ToString(), "COM");
+            ini.Write("toolStripMenuItem3", toolStripMenuItem3.Checked.ToString(), "COM");
+            ini.Write("toolStripMenuItem4", toolStripMenuItem4.Checked.ToString(), "COM");
         }
 
         private void Log(string s)
@@ -506,7 +562,7 @@ namespace ZuartControl
                             rtxShowData.AppendText("\r\n");
                         }
                         rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
-                        rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Hex:" + "\r\n" );
+                        rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Hex:" + "\r\n");
                         rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
                         rtxShowData.AppendText(str.Trim());
                         if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
@@ -741,7 +797,7 @@ namespace ZuartControl
             this.BeginInvoke(new MethodInvoker(delegate
             {
                 RevCount += (UInt64)ReDatas.Length;
-                string str=this.AddData(ReDatas);//输出数据
+                string str = this.AddData(ReDatas);//输出数据
                 ComData_EventArgs comDataReceived_EventArgs = new ComData_EventArgs();
                 comDataReceived_EventArgs.data = ReDatas;
                 comDataReceived_EventArgs.recived_string = str;
@@ -759,7 +815,8 @@ namespace ZuartControl
                 SendStr(e.KeyChar.ToString(), false);
                 e.Handled = true;
                 //}
-            }else
+            }
+            else
             {
                 e.Handled = false;
             }
@@ -882,7 +939,7 @@ namespace ZuartControl
 
             rtxShowData.AppendText(str);
             if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
-            
+
             //}));
         }
         #endregion
@@ -1043,6 +1100,19 @@ namespace ZuartControl
                 lkbSendKey.Text = ((ToolStripMenuItem)sender).Text;
         }
 
+        int X = 0;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
 
+        }
+
+        private void timerDelay_Tick(object sender, EventArgs e)
+        {
+            if (this.ParentForm != null)
+            {
+                ((Timer)sender).Enabled = false;
+                this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
+            }
+        }
     }
 }
