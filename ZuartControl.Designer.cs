@@ -31,6 +31,34 @@
         {
             this.components = new System.ComponentModel.Container();
             this.panel_Setting = new System.Windows.Forms.Panel();
+            this.groupboxRecSetting = new System.Windows.Forms.GroupBox();
+            this.chkIsShow = new System.Windows.Forms.CheckBox();
+            this.chkAutoScroll = new System.Windows.Forms.CheckBox();
+            this.chkRecSend = new System.Windows.Forms.CheckBox();
+            this.lkbSaveRev = new System.Windows.Forms.LinkLabel();
+            this.rbtnUnicode = new System.Windows.Forms.RadioButton();
+            this.rbtnUTF8 = new System.Windows.Forms.RadioButton();
+            this.rbtnASCII = new System.Windows.Forms.RadioButton();
+            this.rbtnHex = new System.Windows.Forms.RadioButton();
+            this.lkbClearRev = new System.Windows.Forms.LinkLabel();
+            this.chkShowTime = new System.Windows.Forms.CheckBox();
+            this.chkAutoLine = new System.Windows.Forms.CheckBox();
+            this.tabControlComNet = new System.Windows.Forms.TabControl();
+            this.tabComSetting = new System.Windows.Forms.TabPage();
+            this.chkDTR = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.chkRTS = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cbbParity = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.cbbStopBits = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.btnOpen = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbbDataBits = new System.Windows.Forms.ComboBox();
+            this.cbbComList = new System.Windows.Forms.ComboBox();
+            this.cbbBaudRate = new System.Windows.Forms.ComboBox();
+            this.tabNetSetting = new System.Windows.Forms.TabPage();
             this.groupboxSendSetting = new System.Windows.Forms.GroupBox();
             this.chkfromFileSend = new System.Windows.Forms.CheckBox();
             this.txtAutoSendms = new System.Windows.Forms.TextBox();
@@ -44,32 +72,6 @@
             this.rbtnSendUTF8 = new System.Windows.Forms.RadioButton();
             this.lkbSendKey = new System.Windows.Forms.LinkLabel();
             this.lkbClearSend = new System.Windows.Forms.LinkLabel();
-            this.groupboxRecSetting = new System.Windows.Forms.GroupBox();
-            this.chkIsShow = new System.Windows.Forms.CheckBox();
-            this.chkAutoScroll = new System.Windows.Forms.CheckBox();
-            this.chkRecSend = new System.Windows.Forms.CheckBox();
-            this.lkbSaveRev = new System.Windows.Forms.LinkLabel();
-            this.rbtnUnicode = new System.Windows.Forms.RadioButton();
-            this.rbtnUTF8 = new System.Windows.Forms.RadioButton();
-            this.rbtnASCII = new System.Windows.Forms.RadioButton();
-            this.rbtnHex = new System.Windows.Forms.RadioButton();
-            this.lkbClearRev = new System.Windows.Forms.LinkLabel();
-            this.chkShowTime = new System.Windows.Forms.CheckBox();
-            this.chkAutoLine = new System.Windows.Forms.CheckBox();
-            this.groupBoxComSetting = new System.Windows.Forms.GroupBox();
-            this.chkDTR = new System.Windows.Forms.CheckBox();
-            this.chkRTS = new System.Windows.Forms.CheckBox();
-            this.cbbParity = new System.Windows.Forms.ComboBox();
-            this.cbbStopBits = new System.Windows.Forms.ComboBox();
-            this.btnOpen = new System.Windows.Forms.Button();
-            this.cbbDataBits = new System.Windows.Forms.ComboBox();
-            this.cbbBaudRate = new System.Windows.Forms.ComboBox();
-            this.cbbComList = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.ComDevice = new System.IO.Ports.SerialPort(this.components);
             this.timerAutoSend = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -80,9 +82,10 @@
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.timerDelay = new System.Windows.Forms.Timer(this.components);
             this.panel_Setting.SuspendLayout();
-            this.groupboxSendSetting.SuspendLayout();
             this.groupboxRecSetting.SuspendLayout();
-            this.groupBoxComSetting.SuspendLayout();
+            this.tabControlComNet.SuspendLayout();
+            this.tabComSetting.SuspendLayout();
+            this.groupboxSendSetting.SuspendLayout();
             this.menuSendKey.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -92,14 +95,414 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_Setting.BackColor = System.Drawing.SystemColors.Control;
-            this.panel_Setting.Controls.Add(this.groupboxSendSetting);
             this.panel_Setting.Controls.Add(this.groupboxRecSetting);
-            this.panel_Setting.Controls.Add(this.groupBoxComSetting);
+            this.panel_Setting.Controls.Add(this.tabControlComNet);
+            this.panel_Setting.Controls.Add(this.groupboxSendSetting);
             this.panel_Setting.Location = new System.Drawing.Point(0, 0);
             this.panel_Setting.Margin = new System.Windows.Forms.Padding(4);
             this.panel_Setting.Name = "panel_Setting";
             this.panel_Setting.Size = new System.Drawing.Size(161, 579);
             this.panel_Setting.TabIndex = 0;
+            // 
+            // groupboxRecSetting
+            // 
+            this.groupboxRecSetting.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupboxRecSetting.Controls.Add(this.chkIsShow);
+            this.groupboxRecSetting.Controls.Add(this.chkAutoScroll);
+            this.groupboxRecSetting.Controls.Add(this.chkRecSend);
+            this.groupboxRecSetting.Controls.Add(this.lkbSaveRev);
+            this.groupboxRecSetting.Controls.Add(this.rbtnUnicode);
+            this.groupboxRecSetting.Controls.Add(this.rbtnUTF8);
+            this.groupboxRecSetting.Controls.Add(this.rbtnASCII);
+            this.groupboxRecSetting.Controls.Add(this.rbtnHex);
+            this.groupboxRecSetting.Controls.Add(this.lkbClearRev);
+            this.groupboxRecSetting.Controls.Add(this.chkShowTime);
+            this.groupboxRecSetting.Controls.Add(this.chkAutoLine);
+            this.groupboxRecSetting.Location = new System.Drawing.Point(4, 206);
+            this.groupboxRecSetting.Margin = new System.Windows.Forms.Padding(4);
+            this.groupboxRecSetting.Name = "groupboxRecSetting";
+            this.groupboxRecSetting.Padding = new System.Windows.Forms.Padding(4);
+            this.groupboxRecSetting.Size = new System.Drawing.Size(153, 161);
+            this.groupboxRecSetting.TabIndex = 2;
+            this.groupboxRecSetting.TabStop = false;
+            this.groupboxRecSetting.Text = "接收区设置";
+            // 
+            // chkIsShow
+            // 
+            this.chkIsShow.AutoSize = true;
+            this.chkIsShow.Location = new System.Drawing.Point(15, 81);
+            this.chkIsShow.Margin = new System.Windows.Forms.Padding(4);
+            this.chkIsShow.Name = "chkIsShow";
+            this.chkIsShow.Size = new System.Drawing.Size(108, 16);
+            this.chkIsShow.TabIndex = 4;
+            this.chkIsShow.Text = "接收数据不显示";
+            this.chkIsShow.UseVisualStyleBackColor = true;
+            // 
+            // chkAutoScroll
+            // 
+            this.chkAutoScroll.AutoSize = true;
+            this.chkAutoScroll.Checked = true;
+            this.chkAutoScroll.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAutoScroll.Location = new System.Drawing.Point(15, 65);
+            this.chkAutoScroll.Margin = new System.Windows.Forms.Padding(4);
+            this.chkAutoScroll.Name = "chkAutoScroll";
+            this.chkAutoScroll.Size = new System.Drawing.Size(72, 16);
+            this.chkAutoScroll.TabIndex = 3;
+            this.chkAutoScroll.Text = "自动滚屏";
+            this.chkAutoScroll.UseVisualStyleBackColor = true;
+            // 
+            // chkRecSend
+            // 
+            this.chkRecSend.AutoSize = true;
+            this.chkRecSend.Location = new System.Drawing.Point(15, 49);
+            this.chkRecSend.Margin = new System.Windows.Forms.Padding(4);
+            this.chkRecSend.Name = "chkRecSend";
+            this.chkRecSend.Size = new System.Drawing.Size(96, 16);
+            this.chkRecSend.TabIndex = 2;
+            this.chkRecSend.Text = "输入直接发送";
+            this.chkRecSend.UseVisualStyleBackColor = true;
+            // 
+            // lkbSaveRev
+            // 
+            this.lkbSaveRev.AutoSize = true;
+            this.lkbSaveRev.Location = new System.Drawing.Point(12, 140);
+            this.lkbSaveRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lkbSaveRev.Name = "lkbSaveRev";
+            this.lkbSaveRev.Size = new System.Drawing.Size(53, 12);
+            this.lkbSaveRev.TabIndex = 9;
+            this.lkbSaveRev.TabStop = true;
+            this.lkbSaveRev.Text = "保存数据";
+            this.lkbSaveRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbSaveRev_LinkClicked);
+            // 
+            // rbtnUnicode
+            // 
+            this.rbtnUnicode.AutoSize = true;
+            this.rbtnUnicode.Location = new System.Drawing.Point(70, 117);
+            this.rbtnUnicode.Margin = new System.Windows.Forms.Padding(4);
+            this.rbtnUnicode.Name = "rbtnUnicode";
+            this.rbtnUnicode.Size = new System.Drawing.Size(65, 16);
+            this.rbtnUnicode.TabIndex = 8;
+            this.rbtnUnicode.Text = "Unicode";
+            this.rbtnUnicode.UseVisualStyleBackColor = true;
+            this.rbtnUnicode.Click += new System.EventHandler(this.rbtn_Click);
+            // 
+            // rbtnUTF8
+            // 
+            this.rbtnUTF8.AutoSize = true;
+            this.rbtnUTF8.Location = new System.Drawing.Point(13, 117);
+            this.rbtnUTF8.Margin = new System.Windows.Forms.Padding(4);
+            this.rbtnUTF8.Name = "rbtnUTF8";
+            this.rbtnUTF8.Size = new System.Drawing.Size(53, 16);
+            this.rbtnUTF8.TabIndex = 7;
+            this.rbtnUTF8.Text = "UTF-8";
+            this.rbtnUTF8.UseVisualStyleBackColor = true;
+            this.rbtnUTF8.Click += new System.EventHandler(this.rbtn_Click);
+            // 
+            // rbtnASCII
+            // 
+            this.rbtnASCII.AutoSize = true;
+            this.rbtnASCII.Checked = true;
+            this.rbtnASCII.Location = new System.Drawing.Point(70, 99);
+            this.rbtnASCII.Margin = new System.Windows.Forms.Padding(4);
+            this.rbtnASCII.Name = "rbtnASCII";
+            this.rbtnASCII.Size = new System.Drawing.Size(41, 16);
+            this.rbtnASCII.TabIndex = 6;
+            this.rbtnASCII.TabStop = true;
+            this.rbtnASCII.Text = "GBK";
+            this.rbtnASCII.UseVisualStyleBackColor = true;
+            this.rbtnASCII.Click += new System.EventHandler(this.rbtn_Click);
+            // 
+            // rbtnHex
+            // 
+            this.rbtnHex.AutoSize = true;
+            this.rbtnHex.Location = new System.Drawing.Point(14, 99);
+            this.rbtnHex.Margin = new System.Windows.Forms.Padding(4);
+            this.rbtnHex.Name = "rbtnHex";
+            this.rbtnHex.Size = new System.Drawing.Size(41, 16);
+            this.rbtnHex.TabIndex = 5;
+            this.rbtnHex.Text = "Hex";
+            this.rbtnHex.UseVisualStyleBackColor = true;
+            this.rbtnHex.Click += new System.EventHandler(this.rbtn_Click);
+            // 
+            // lkbClearRev
+            // 
+            this.lkbClearRev.AutoSize = true;
+            this.lkbClearRev.Location = new System.Drawing.Point(76, 140);
+            this.lkbClearRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lkbClearRev.Name = "lkbClearRev";
+            this.lkbClearRev.Size = new System.Drawing.Size(53, 12);
+            this.lkbClearRev.TabIndex = 10;
+            this.lkbClearRev.TabStop = true;
+            this.lkbClearRev.Text = "清除接收";
+            this.lkbClearRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbClearRev_LinkClicked);
+            // 
+            // chkShowTime
+            // 
+            this.chkShowTime.AutoSize = true;
+            this.chkShowTime.Location = new System.Drawing.Point(15, 33);
+            this.chkShowTime.Margin = new System.Windows.Forms.Padding(4);
+            this.chkShowTime.Name = "chkShowTime";
+            this.chkShowTime.Size = new System.Drawing.Size(96, 16);
+            this.chkShowTime.TabIndex = 1;
+            this.chkShowTime.Text = "日志模式显示";
+            this.chkShowTime.UseVisualStyleBackColor = true;
+            this.chkShowTime.CheckedChanged += new System.EventHandler(this.chkShowTime_CheckedChanged);
+            // 
+            // chkAutoLine
+            // 
+            this.chkAutoLine.AutoSize = true;
+            this.chkAutoLine.Location = new System.Drawing.Point(15, 17);
+            this.chkAutoLine.Margin = new System.Windows.Forms.Padding(4);
+            this.chkAutoLine.Name = "chkAutoLine";
+            this.chkAutoLine.Size = new System.Drawing.Size(96, 16);
+            this.chkAutoLine.TabIndex = 0;
+            this.chkAutoLine.Text = "自动换行显示";
+            this.chkAutoLine.UseVisualStyleBackColor = true;
+            // 
+            // tabControlComNet
+            // 
+            this.tabControlComNet.Controls.Add(this.tabComSetting);
+            this.tabControlComNet.Controls.Add(this.tabNetSetting);
+            this.tabControlComNet.Location = new System.Drawing.Point(-4, -1);
+            this.tabControlComNet.Name = "tabControlComNet";
+            this.tabControlComNet.SelectedIndex = 0;
+            this.tabControlComNet.Size = new System.Drawing.Size(170, 213);
+            this.tabControlComNet.TabIndex = 4;
+            this.tabControlComNet.SelectedIndexChanged += new System.EventHandler(this.tabControlComNet_SelectedIndexChanged);
+            // 
+            // tabComSetting
+            // 
+            this.tabComSetting.BackColor = System.Drawing.SystemColors.Control;
+            this.tabComSetting.Controls.Add(this.chkDTR);
+            this.tabComSetting.Controls.Add(this.label1);
+            this.tabComSetting.Controls.Add(this.chkRTS);
+            this.tabComSetting.Controls.Add(this.label3);
+            this.tabComSetting.Controls.Add(this.cbbParity);
+            this.tabComSetting.Controls.Add(this.label4);
+            this.tabComSetting.Controls.Add(this.cbbStopBits);
+            this.tabComSetting.Controls.Add(this.label5);
+            this.tabComSetting.Controls.Add(this.btnOpen);
+            this.tabComSetting.Controls.Add(this.label2);
+            this.tabComSetting.Controls.Add(this.cbbDataBits);
+            this.tabComSetting.Controls.Add(this.cbbComList);
+            this.tabComSetting.Controls.Add(this.cbbBaudRate);
+            this.tabComSetting.Location = new System.Drawing.Point(4, 22);
+            this.tabComSetting.Margin = new System.Windows.Forms.Padding(0);
+            this.tabComSetting.Name = "tabComSetting";
+            this.tabComSetting.Padding = new System.Windows.Forms.Padding(3);
+            this.tabComSetting.Size = new System.Drawing.Size(162, 187);
+            this.tabComSetting.TabIndex = 0;
+            this.tabComSetting.Text = "端口设置";
+            // 
+            // chkDTR
+            // 
+            this.chkDTR.AutoSize = true;
+            this.chkDTR.Checked = true;
+            this.chkDTR.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDTR.Enabled = false;
+            this.chkDTR.Location = new System.Drawing.Point(91, 121);
+            this.chkDTR.Margin = new System.Windows.Forms.Padding(4);
+            this.chkDTR.Name = "chkDTR";
+            this.chkDTR.Size = new System.Drawing.Size(42, 16);
+            this.chkDTR.TabIndex = 7;
+            this.chkDTR.Text = "DTR";
+            this.chkDTR.UseVisualStyleBackColor = true;
+            this.chkDTR.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 5);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(29, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "端口";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // chkRTS
+            // 
+            this.chkRTS.AutoSize = true;
+            this.chkRTS.Checked = true;
+            this.chkRTS.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkRTS.Enabled = false;
+            this.chkRTS.Location = new System.Drawing.Point(15, 121);
+            this.chkRTS.Margin = new System.Windows.Forms.Padding(4);
+            this.chkRTS.Name = "chkRTS";
+            this.chkRTS.Size = new System.Drawing.Size(42, 16);
+            this.chkRTS.TabIndex = 6;
+            this.chkRTS.Text = "RTS";
+            this.chkRTS.UseVisualStyleBackColor = true;
+            this.chkRTS.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(1, 53);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "数据位";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbParity
+            // 
+            this.cbbParity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbParity.Items.AddRange(new object[] {
+            "None",
+            "Odd",
+            "Even",
+            "Mark",
+            "Space"});
+            this.cbbParity.Location = new System.Drawing.Point(52, 97);
+            this.cbbParity.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbParity.Name = "cbbParity";
+            this.cbbParity.Size = new System.Drawing.Size(101, 20);
+            this.cbbParity.TabIndex = 5;
+            this.cbbParity.TextChanged += new System.EventHandler(this.cbbComSetChange);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(1, 77);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(41, 12);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "停止位";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbStopBits
+            // 
+            this.cbbStopBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbStopBits.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3"});
+            this.cbbStopBits.Location = new System.Drawing.Point(52, 73);
+            this.cbbStopBits.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbStopBits.Name = "cbbStopBits";
+            this.cbbStopBits.Size = new System.Drawing.Size(101, 20);
+            this.cbbStopBits.TabIndex = 4;
+            this.cbbStopBits.TextChanged += new System.EventHandler(this.cbbComSetChange);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(1, 101);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(41, 12);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "校验位";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnOpen.Font = new System.Drawing.Font("宋体", 10F);
+            this.btnOpen.Image = global::ZuartControl.Properties.Resources.close;
+            this.btnOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnOpen.Location = new System.Drawing.Point(0, 139);
+            this.btnOpen.Margin = new System.Windows.Forms.Padding(4);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
+            this.btnOpen.Size = new System.Drawing.Size(162, 41);
+            this.btnOpen.TabIndex = 8;
+            this.btnOpen.Text = " 打开串口";
+            this.btnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnOpen.UseVisualStyleBackColor = true;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(1, 29);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 12);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "波特率";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbDataBits
+            // 
+            this.cbbDataBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbDataBits.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.cbbDataBits.Items.AddRange(new object[] {
+            "8",
+            "7",
+            "6"});
+            this.cbbDataBits.Location = new System.Drawing.Point(52, 49);
+            this.cbbDataBits.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbDataBits.Name = "cbbDataBits";
+            this.cbbDataBits.Size = new System.Drawing.Size(101, 20);
+            this.cbbDataBits.TabIndex = 3;
+            this.cbbDataBits.Text = "8";
+            this.cbbDataBits.TextChanged += new System.EventHandler(this.cbbComSetChange);
+            // 
+            // cbbComList
+            // 
+            this.cbbComList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbComList.DisplayMember = "1";
+            this.cbbComList.FormattingEnabled = true;
+            this.cbbComList.Location = new System.Drawing.Point(52, 1);
+            this.cbbComList.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbComList.Name = "cbbComList";
+            this.cbbComList.Size = new System.Drawing.Size(101, 20);
+            this.cbbComList.TabIndex = 1;
+            this.cbbComList.DropDown += new System.EventHandler(this.cbbComList_DropDown);
+            this.cbbComList.TextChanged += new System.EventHandler(this.cbbComSetChange);
+            // 
+            // cbbBaudRate
+            // 
+            this.cbbBaudRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbBaudRate.DisplayMember = "1";
+            this.cbbBaudRate.FormattingEnabled = true;
+            this.cbbBaudRate.Items.AddRange(new object[] {
+            "300",
+            "600",
+            "1200",
+            "2400",
+            "4800",
+            "9600",
+            "14400",
+            "19200",
+            "38400",
+            "43000",
+            "56000",
+            "57600",
+            "74880",
+            "115200",
+            "128000",
+            "256000"});
+            this.cbbBaudRate.Location = new System.Drawing.Point(52, 25);
+            this.cbbBaudRate.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbBaudRate.Name = "cbbBaudRate";
+            this.cbbBaudRate.Size = new System.Drawing.Size(101, 20);
+            this.cbbBaudRate.TabIndex = 2;
+            this.cbbBaudRate.Text = "115200";
+            this.cbbBaudRate.ValueMember = "1";
+            this.cbbBaudRate.TextChanged += new System.EventHandler(this.cbbComSetChange);
+            // 
+            // tabNetSetting
+            // 
+            this.tabNetSetting.BackColor = System.Drawing.SystemColors.Control;
+            this.tabNetSetting.Location = new System.Drawing.Point(4, 22);
+            this.tabNetSetting.Name = "tabNetSetting";
+            this.tabNetSetting.Padding = new System.Windows.Forms.Padding(3);
+            this.tabNetSetting.Size = new System.Drawing.Size(162, 187);
+            this.tabNetSetting.TabIndex = 1;
+            this.tabNetSetting.Text = "tabPage2";
             // 
             // groupboxSendSetting
             // 
@@ -273,388 +676,6 @@
             this.lkbClearSend.Text = "清除发送";
             this.lkbClearSend.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbClearSend_LinkClicked);
             // 
-            // groupboxRecSetting
-            // 
-            this.groupboxRecSetting.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupboxRecSetting.Controls.Add(this.chkIsShow);
-            this.groupboxRecSetting.Controls.Add(this.chkAutoScroll);
-            this.groupboxRecSetting.Controls.Add(this.chkRecSend);
-            this.groupboxRecSetting.Controls.Add(this.lkbSaveRev);
-            this.groupboxRecSetting.Controls.Add(this.rbtnUnicode);
-            this.groupboxRecSetting.Controls.Add(this.rbtnUTF8);
-            this.groupboxRecSetting.Controls.Add(this.rbtnASCII);
-            this.groupboxRecSetting.Controls.Add(this.rbtnHex);
-            this.groupboxRecSetting.Controls.Add(this.lkbClearRev);
-            this.groupboxRecSetting.Controls.Add(this.chkShowTime);
-            this.groupboxRecSetting.Controls.Add(this.chkAutoLine);
-            this.groupboxRecSetting.Location = new System.Drawing.Point(4, 220);
-            this.groupboxRecSetting.Margin = new System.Windows.Forms.Padding(4);
-            this.groupboxRecSetting.Name = "groupboxRecSetting";
-            this.groupboxRecSetting.Padding = new System.Windows.Forms.Padding(4);
-            this.groupboxRecSetting.Size = new System.Drawing.Size(153, 161);
-            this.groupboxRecSetting.TabIndex = 2;
-            this.groupboxRecSetting.TabStop = false;
-            this.groupboxRecSetting.Text = "接收区设置";
-            // 
-            // chkIsShow
-            // 
-            this.chkIsShow.AutoSize = true;
-            this.chkIsShow.Location = new System.Drawing.Point(15, 81);
-            this.chkIsShow.Margin = new System.Windows.Forms.Padding(4);
-            this.chkIsShow.Name = "chkIsShow";
-            this.chkIsShow.Size = new System.Drawing.Size(108, 16);
-            this.chkIsShow.TabIndex = 4;
-            this.chkIsShow.Text = "接收数据不显示";
-            this.chkIsShow.UseVisualStyleBackColor = true;
-            // 
-            // chkAutoScroll
-            // 
-            this.chkAutoScroll.AutoSize = true;
-            this.chkAutoScroll.Checked = true;
-            this.chkAutoScroll.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAutoScroll.Location = new System.Drawing.Point(15, 65);
-            this.chkAutoScroll.Margin = new System.Windows.Forms.Padding(4);
-            this.chkAutoScroll.Name = "chkAutoScroll";
-            this.chkAutoScroll.Size = new System.Drawing.Size(72, 16);
-            this.chkAutoScroll.TabIndex = 3;
-            this.chkAutoScroll.Text = "自动滚屏";
-            this.chkAutoScroll.UseVisualStyleBackColor = true;
-            // 
-            // chkRecSend
-            // 
-            this.chkRecSend.AutoSize = true;
-            this.chkRecSend.Location = new System.Drawing.Point(15, 49);
-            this.chkRecSend.Margin = new System.Windows.Forms.Padding(4);
-            this.chkRecSend.Name = "chkRecSend";
-            this.chkRecSend.Size = new System.Drawing.Size(96, 16);
-            this.chkRecSend.TabIndex = 2;
-            this.chkRecSend.Text = "输入直接发送";
-            this.chkRecSend.UseVisualStyleBackColor = true;
-            // 
-            // lkbSaveRev
-            // 
-            this.lkbSaveRev.AutoSize = true;
-            this.lkbSaveRev.Location = new System.Drawing.Point(12, 140);
-            this.lkbSaveRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lkbSaveRev.Name = "lkbSaveRev";
-            this.lkbSaveRev.Size = new System.Drawing.Size(53, 12);
-            this.lkbSaveRev.TabIndex = 9;
-            this.lkbSaveRev.TabStop = true;
-            this.lkbSaveRev.Text = "保存数据";
-            this.lkbSaveRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbSaveRev_LinkClicked);
-            // 
-            // rbtnUnicode
-            // 
-            this.rbtnUnicode.AutoSize = true;
-            this.rbtnUnicode.Location = new System.Drawing.Point(70, 117);
-            this.rbtnUnicode.Margin = new System.Windows.Forms.Padding(4);
-            this.rbtnUnicode.Name = "rbtnUnicode";
-            this.rbtnUnicode.Size = new System.Drawing.Size(65, 16);
-            this.rbtnUnicode.TabIndex = 8;
-            this.rbtnUnicode.Text = "Unicode";
-            this.rbtnUnicode.UseVisualStyleBackColor = true;
-            this.rbtnUnicode.Click += new System.EventHandler(this.rbtn_Click);
-            // 
-            // rbtnUTF8
-            // 
-            this.rbtnUTF8.AutoSize = true;
-            this.rbtnUTF8.Location = new System.Drawing.Point(13, 117);
-            this.rbtnUTF8.Margin = new System.Windows.Forms.Padding(4);
-            this.rbtnUTF8.Name = "rbtnUTF8";
-            this.rbtnUTF8.Size = new System.Drawing.Size(53, 16);
-            this.rbtnUTF8.TabIndex = 7;
-            this.rbtnUTF8.Text = "UTF-8";
-            this.rbtnUTF8.UseVisualStyleBackColor = true;
-            this.rbtnUTF8.Click += new System.EventHandler(this.rbtn_Click);
-            // 
-            // rbtnASCII
-            // 
-            this.rbtnASCII.AutoSize = true;
-            this.rbtnASCII.Checked = true;
-            this.rbtnASCII.Location = new System.Drawing.Point(70, 99);
-            this.rbtnASCII.Margin = new System.Windows.Forms.Padding(4);
-            this.rbtnASCII.Name = "rbtnASCII";
-            this.rbtnASCII.Size = new System.Drawing.Size(41, 16);
-            this.rbtnASCII.TabIndex = 6;
-            this.rbtnASCII.TabStop = true;
-            this.rbtnASCII.Text = "GBK";
-            this.rbtnASCII.UseVisualStyleBackColor = true;
-            this.rbtnASCII.Click += new System.EventHandler(this.rbtn_Click);
-            // 
-            // rbtnHex
-            // 
-            this.rbtnHex.AutoSize = true;
-            this.rbtnHex.Location = new System.Drawing.Point(14, 99);
-            this.rbtnHex.Margin = new System.Windows.Forms.Padding(4);
-            this.rbtnHex.Name = "rbtnHex";
-            this.rbtnHex.Size = new System.Drawing.Size(41, 16);
-            this.rbtnHex.TabIndex = 5;
-            this.rbtnHex.Text = "Hex";
-            this.rbtnHex.UseVisualStyleBackColor = true;
-            this.rbtnHex.Click += new System.EventHandler(this.rbtn_Click);
-            // 
-            // lkbClearRev
-            // 
-            this.lkbClearRev.AutoSize = true;
-            this.lkbClearRev.Location = new System.Drawing.Point(76, 140);
-            this.lkbClearRev.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lkbClearRev.Name = "lkbClearRev";
-            this.lkbClearRev.Size = new System.Drawing.Size(53, 12);
-            this.lkbClearRev.TabIndex = 10;
-            this.lkbClearRev.TabStop = true;
-            this.lkbClearRev.Text = "清除接收";
-            this.lkbClearRev.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lkbClearRev_LinkClicked);
-            // 
-            // chkShowTime
-            // 
-            this.chkShowTime.AutoSize = true;
-            this.chkShowTime.Location = new System.Drawing.Point(15, 33);
-            this.chkShowTime.Margin = new System.Windows.Forms.Padding(4);
-            this.chkShowTime.Name = "chkShowTime";
-            this.chkShowTime.Size = new System.Drawing.Size(96, 16);
-            this.chkShowTime.TabIndex = 1;
-            this.chkShowTime.Text = "日志模式显示";
-            this.chkShowTime.UseVisualStyleBackColor = true;
-            this.chkShowTime.CheckedChanged += new System.EventHandler(this.chkShowTime_CheckedChanged);
-            // 
-            // chkAutoLine
-            // 
-            this.chkAutoLine.AutoSize = true;
-            this.chkAutoLine.Location = new System.Drawing.Point(15, 17);
-            this.chkAutoLine.Margin = new System.Windows.Forms.Padding(4);
-            this.chkAutoLine.Name = "chkAutoLine";
-            this.chkAutoLine.Size = new System.Drawing.Size(96, 16);
-            this.chkAutoLine.TabIndex = 0;
-            this.chkAutoLine.Text = "自动换行显示";
-            this.chkAutoLine.UseVisualStyleBackColor = true;
-            // 
-            // groupBoxComSetting
-            // 
-            this.groupBoxComSetting.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxComSetting.Controls.Add(this.chkDTR);
-            this.groupBoxComSetting.Controls.Add(this.chkRTS);
-            this.groupBoxComSetting.Controls.Add(this.cbbParity);
-            this.groupBoxComSetting.Controls.Add(this.cbbStopBits);
-            this.groupBoxComSetting.Controls.Add(this.btnOpen);
-            this.groupBoxComSetting.Controls.Add(this.cbbDataBits);
-            this.groupBoxComSetting.Controls.Add(this.cbbBaudRate);
-            this.groupBoxComSetting.Controls.Add(this.cbbComList);
-            this.groupBoxComSetting.Controls.Add(this.label2);
-            this.groupBoxComSetting.Controls.Add(this.label5);
-            this.groupBoxComSetting.Controls.Add(this.label1);
-            this.groupBoxComSetting.Controls.Add(this.label4);
-            this.groupBoxComSetting.Controls.Add(this.label3);
-            this.groupBoxComSetting.Font = new System.Drawing.Font("宋体", 10F);
-            this.groupBoxComSetting.Location = new System.Drawing.Point(4, 4);
-            this.groupBoxComSetting.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBoxComSetting.Name = "groupBoxComSetting";
-            this.groupBoxComSetting.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBoxComSetting.Size = new System.Drawing.Size(153, 212);
-            this.groupBoxComSetting.TabIndex = 1;
-            this.groupBoxComSetting.TabStop = false;
-            this.groupBoxComSetting.Text = "端口设置";
-            // 
-            // chkDTR
-            // 
-            this.chkDTR.AutoSize = true;
-            this.chkDTR.Checked = true;
-            this.chkDTR.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDTR.Enabled = false;
-            this.chkDTR.Location = new System.Drawing.Point(103, 149);
-            this.chkDTR.Margin = new System.Windows.Forms.Padding(4);
-            this.chkDTR.Name = "chkDTR";
-            this.chkDTR.Size = new System.Drawing.Size(47, 18);
-            this.chkDTR.TabIndex = 7;
-            this.chkDTR.Text = "DTR";
-            this.chkDTR.UseVisualStyleBackColor = true;
-            this.chkDTR.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
-            // 
-            // chkRTS
-            // 
-            this.chkRTS.AutoSize = true;
-            this.chkRTS.Checked = true;
-            this.chkRTS.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRTS.Enabled = false;
-            this.chkRTS.Location = new System.Drawing.Point(27, 149);
-            this.chkRTS.Margin = new System.Windows.Forms.Padding(4);
-            this.chkRTS.Name = "chkRTS";
-            this.chkRTS.Size = new System.Drawing.Size(47, 18);
-            this.chkRTS.TabIndex = 6;
-            this.chkRTS.Text = "RTS";
-            this.chkRTS.UseVisualStyleBackColor = true;
-            this.chkRTS.CheckedChanged += new System.EventHandler(this.chkRTS_DTR_CheckedChanged);
-            // 
-            // cbbParity
-            // 
-            this.cbbParity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbParity.Items.AddRange(new object[] {
-            "None",
-            "Odd",
-            "Even",
-            "Mark",
-            "Space"});
-            this.cbbParity.Location = new System.Drawing.Point(52, 120);
-            this.cbbParity.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbParity.Name = "cbbParity";
-            this.cbbParity.Size = new System.Drawing.Size(93, 21);
-            this.cbbParity.TabIndex = 5;
-            this.cbbParity.TextChanged += new System.EventHandler(this.cbbComSetChange);
-            // 
-            // cbbStopBits
-            // 
-            this.cbbStopBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbStopBits.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3"});
-            this.cbbStopBits.Location = new System.Drawing.Point(52, 94);
-            this.cbbStopBits.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbStopBits.Name = "cbbStopBits";
-            this.cbbStopBits.Size = new System.Drawing.Size(93, 21);
-            this.cbbStopBits.TabIndex = 4;
-            this.cbbStopBits.TextChanged += new System.EventHandler(this.cbbComSetChange);
-            // 
-            // btnOpen
-            // 
-            this.btnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnOpen.Font = new System.Drawing.Font("宋体", 10F);
-            this.btnOpen.Image = global::ZuartControl.Properties.Resources.close;
-            this.btnOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnOpen.Location = new System.Drawing.Point(4, 167);
-            this.btnOpen.Margin = new System.Windows.Forms.Padding(4);
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
-            this.btnOpen.Size = new System.Drawing.Size(146, 41);
-            this.btnOpen.TabIndex = 8;
-            this.btnOpen.Text = " 打开串口";
-            this.btnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnOpen.UseVisualStyleBackColor = true;
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // cbbDataBits
-            // 
-            this.cbbDataBits.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbDataBits.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.cbbDataBits.Items.AddRange(new object[] {
-            "8",
-            "7",
-            "6"});
-            this.cbbDataBits.Location = new System.Drawing.Point(52, 68);
-            this.cbbDataBits.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbDataBits.Name = "cbbDataBits";
-            this.cbbDataBits.Size = new System.Drawing.Size(93, 21);
-            this.cbbDataBits.TabIndex = 3;
-            this.cbbDataBits.Text = "8";
-            this.cbbDataBits.TextChanged += new System.EventHandler(this.cbbComSetChange);
-            // 
-            // cbbBaudRate
-            // 
-            this.cbbBaudRate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbBaudRate.DisplayMember = "1";
-            this.cbbBaudRate.FormattingEnabled = true;
-            this.cbbBaudRate.Items.AddRange(new object[] {
-            "300",
-            "600",
-            "1200",
-            "2400",
-            "4800",
-            "9600",
-            "14400",
-            "19200",
-            "38400",
-            "43000",
-            "56000",
-            "57600",
-            "74880",
-            "115200",
-            "128000",
-            "256000"});
-            this.cbbBaudRate.Location = new System.Drawing.Point(52, 42);
-            this.cbbBaudRate.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbBaudRate.Name = "cbbBaudRate";
-            this.cbbBaudRate.Size = new System.Drawing.Size(93, 21);
-            this.cbbBaudRate.TabIndex = 2;
-            this.cbbBaudRate.Text = "115200";
-            this.cbbBaudRate.ValueMember = "1";
-            this.cbbBaudRate.TextChanged += new System.EventHandler(this.cbbComSetChange);
-            // 
-            // cbbComList
-            // 
-            this.cbbComList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbComList.DisplayMember = "1";
-            this.cbbComList.FormattingEnabled = true;
-            this.cbbComList.Location = new System.Drawing.Point(52, 16);
-            this.cbbComList.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbComList.Name = "cbbComList";
-            this.cbbComList.Size = new System.Drawing.Size(93, 21);
-            this.cbbComList.TabIndex = 1;
-            this.cbbComList.DropDown += new System.EventHandler(this.cbbComList_DropDown);
-            this.cbbComList.TextChanged += new System.EventHandler(this.cbbComSetChange);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(1, 45);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(49, 14);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "波特率";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(1, 123);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(49, 14);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "校验位";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(1, 19);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 14);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "端口";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(1, 97);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(49, 14);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "停止位";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1, 71);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(49, 14);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "数据位";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // ComDevice
             // 
             this.ComDevice.ReadTimeout = 1000;
@@ -721,12 +742,13 @@
             this.Name = "ZuartControl";
             this.Size = new System.Drawing.Size(161, 579);
             this.panel_Setting.ResumeLayout(false);
-            this.groupboxSendSetting.ResumeLayout(false);
-            this.groupboxSendSetting.PerformLayout();
             this.groupboxRecSetting.ResumeLayout(false);
             this.groupboxRecSetting.PerformLayout();
-            this.groupBoxComSetting.ResumeLayout(false);
-            this.groupBoxComSetting.PerformLayout();
+            this.tabControlComNet.ResumeLayout(false);
+            this.tabComSetting.ResumeLayout(false);
+            this.tabComSetting.PerformLayout();
+            this.groupboxSendSetting.ResumeLayout(false);
+            this.groupboxSendSetting.PerformLayout();
             this.menuSendKey.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -735,7 +757,6 @@
         #endregion
 
         private System.Windows.Forms.Panel panel_Setting;
-        private System.Windows.Forms.GroupBox groupBoxComSetting;
         private System.Windows.Forms.ComboBox cbbParity;
         private System.Windows.Forms.ComboBox cbbStopBits;
         private System.Windows.Forms.ComboBox cbbDataBits;
@@ -783,5 +804,8 @@
         public System.Windows.Forms.TextBox txtAutoSendms;
         private System.Windows.Forms.CheckBox chkIsShow;
         private System.Windows.Forms.Timer timerDelay;
+        private System.Windows.Forms.TabControl tabControlComNet;
+        private System.Windows.Forms.TabPage tabComSetting;
+        private System.Windows.Forms.TabPage tabNetSetting;
     }
 }

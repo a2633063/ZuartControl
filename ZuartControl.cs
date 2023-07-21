@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.IO.Ports;
 using System.IO;
 using TextBox = System.Windows.Forms.TextBox;
 using Button = System.Windows.Forms.Button;
 using System.Configuration;
+using RadioButton = System.Windows.Forms.RadioButton;
 
 namespace ZuartControl
 {
@@ -334,6 +330,7 @@ namespace ZuartControl
             Labellog.Text = s;
         }
 
+        #region 串口相关
         #region 打开串口按钮
         private void btnOpen_Click(object sender, EventArgs e)
         {
@@ -425,6 +422,7 @@ namespace ZuartControl
         }
         #endregion
 
+        #endregion
 
 
         #region 发送数据
@@ -434,45 +432,52 @@ namespace ZuartControl
         }
         public bool SendData(byte[] data, int data_offset, long data_lenght)
         {
-            if (ComDevice.IsOpen)
+            if (tabControlComNet.SelectedTab == tabComSetting)  //串口发送
             {
-                try
+                if (ComDevice.IsOpen)
                 {
-
-                    byte[] data_temp = new byte[4096];
-
-                    long offect = 0;
-                    long length = 4096;
-
-                    for (offect = data_offset; offect < data.LongLength && offect < data_offset + data_lenght; offect += length)
+                    try
                     {
-                        length = 4096;
-                        if (length > data_lenght - offect) length = data_lenght - offect;
-                        Array.Copy(data, offect, data_temp, 0, length);
-                        ComDevice.Write(data_temp, 0, (int)length);//发送数据
-                        SendCount += (UInt64)length;
+
+                        byte[] data_temp = new byte[4096];
+
+                        long offect = 0;
+                        long length = 4096;
+
+                        for (offect = data_offset; offect < data.LongLength && offect < data_offset + data_lenght; offect += length)
+                        {
+                            length = 4096;
+                            if (length > data_lenght - offect) length = data_lenght - offect;
+                            Array.Copy(data, offect, data_temp, 0, length);
+                            ComDevice.Write(data_temp, 0, (int)length);//发送数据
+                            SendCount += (UInt64)length;
+                        }
+
+                        //ComDevice.Write(data, 0, data.Length);//发送数据
+                        //SendCount += (UInt64)data.Length;
+
+                        if (OnComDataSend != null)
+                        {
+                            ComData_EventArgs comData_EventArgs = new ComData_EventArgs();
+                            comData_EventArgs.data = data;
+                            OnComDataSend(this, comData_EventArgs);
+                        }
+                        return true;
                     }
-
-                    //ComDevice.Write(data, 0, data.Length);//发送数据
-                    //SendCount += (UInt64)data.Length;
-
-                    if (OnComDataSend != null)
+                    catch (Exception ex)
                     {
-                        ComData_EventArgs comData_EventArgs = new ComData_EventArgs();
-                        comData_EventArgs.data = data;
-                        OnComDataSend(this, comData_EventArgs);
+                        MessageBox.Show(ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    return true;
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show(ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("串口未打开", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    AddContent("串口未打开\r\n");
                 }
             }
-            else
+            else if (tabControlComNet.SelectedTab == tabNetSetting) //网络发送
             {
-                //MessageBox.Show("串口未打开", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AddContent("串口未打开\r\n");
+
             }
             return false;
         }
@@ -513,14 +518,14 @@ namespace ZuartControl
                 if (timerAutoSend.Enabled)
                 {
                     timerAutoSend.Enabled = false;
-                    groupBoxComSetting.Enabled = true;
+                    tabControlComNet.Enabled = true;
                     groupboxSendSetting.Enabled = true;
                     if (btnSend != null) btnSend.Text = "发送";
                 }
                 else
                 {
                     timerAutoSend.Enabled = true;
-                    groupBoxComSetting.Enabled = false;
+                    tabControlComNet.Enabled = false;
                     groupboxSendSetting.Enabled = false;
                     if (btnSend != null) btnSend.Text = "停止发送";
                 }
@@ -790,6 +795,7 @@ namespace ZuartControl
         #endregion
 
         #region 接收数据监听
+        #region 串口监听
         private void Com_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             byte[] ReDatas = new byte[ComDevice.BytesToRead];
@@ -803,7 +809,8 @@ namespace ZuartControl
                 comDataReceived_EventArgs.recived_string = str;
                 if (OnComDataReceived != null) OnComDataReceived(this, comDataReceived_EventArgs);
             }));
-        }
+        } 
+        #endregion
         #endregion
         #region 接收文本框,输入监听,供输入直接发送
         private void txtShowData_KeyPress(object sender, KeyPressEventArgs e)
@@ -1077,6 +1084,7 @@ namespace ZuartControl
         }
         #endregion
 
+        #region 发送快捷键设置监听
         private void lkbSendKey_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             menuSendKey.Show(lkbSendKey, 0, lkbSendKey.Height);
@@ -1099,13 +1107,9 @@ namespace ZuartControl
             if (((ToolStripMenuItem)sender).CheckState == CheckState.Checked)
                 lkbSendKey.Text = ((ToolStripMenuItem)sender).Text;
         }
+        #endregion
 
-        int X = 0;
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-
-        }
-
+        #region 增加退出事件,退出时保存设置
         private void timerDelay_Tick(object sender, EventArgs e)
         {
             if (this.ParentForm != null)
@@ -1113,6 +1117,21 @@ namespace ZuartControl
                 ((Timer)sender).Enabled = false;
                 this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
             }
-        }
+        } 
+        #endregion
+
+        #region 串口/网络界面事件监听
+        private void tabControlComNet_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsComOpen)
+            {
+                if (tabControlComNet.SelectedTab != tabComSetting)
+                {
+                    AddContent("请先关闭串口\r\n");
+                    tabControlComNet.SelectedTab = tabComSetting;
+                }
+            }
+        } 
+        #endregion
     }
 }
