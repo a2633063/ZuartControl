@@ -219,11 +219,34 @@ namespace ZuartControl
         public UInt64 RevCount { get; set; }    //接收计数
         public UInt64 SendCount { get; set; }    //发送计数
         public string SendFileName { get; set; }    //外部文件源
+        public bool IsComOrNetOpen
+        {
+            get
+            {
+                return IsComOpen || IsNetOpen;
+            }
+        }
+
         public bool IsComOpen
         {
             get
             {
                 return ComDevice.IsOpen;
+            }
+        }
+        public bool IsNetOpen
+        {
+            get
+            {
+                if (socket == null) return false;
+
+
+                bool part1 = socket.Poll(1000, SelectMode.SelectRead);
+                bool part2 = (socket.Available == 0);
+                if (part1 && part2)
+                    return false;
+                else
+                    return true;
             }
         }
         private string IniPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Zip", "zuartControl.ini");
@@ -246,10 +269,10 @@ namespace ZuartControl
         {
             if (iniFileName == null) iniFileName = "zuartControl.ini";
             IniPath = Path.Combine(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath), iniFileName);
-            
+
             #region 控件初始化
             cbbComList.Items.AddRange(SerialPort.GetPortNames());
-            cbbLocalIP_DropDown(cbbLocalIP,null);   //cbbLocalIP打开列表事件,更新ip列表
+            cbbLocalIP_DropDown(cbbLocalIP, null);   //cbbLocalIP打开列表事件,更新ip列表
             if (this.ParentForm != null) this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
 
             System.Diagnostics.Debug.WriteLine($"init");
@@ -268,7 +291,7 @@ namespace ZuartControl
             cbbParity.Text = ini.Read("cbbParity", "COM") ?? "None";
 
             //网络设置
-            string localip = ini.Read("cbbLocalIP", "COM")??"";
+            string localip = ini.Read("cbbLocalIP", "COM") ?? "";
             if (cbbLocalIP.Items.Contains(localip))
             {
                 cbbLocalIP.Text = localip;
@@ -278,10 +301,10 @@ namespace ZuartControl
                 cbbLocalIP.SelectedIndex = 0;
             }
 
-            cbbNetList.Text = ini.Read("cbbNetList", "COM")??"UDP";
-            txtRemoteIP.Text = ini.Read("txtRemoteIP", "COM")?? cbbLocalIP.Text;
-            txtRemotePort.Text = ini.Read("txtRemotePort", "COM")??"80";
-            txtLocalPort.Text = ini.Read("txtLocalPort", "COM")??"777";
+            cbbNetList.Text = ini.Read("cbbNetList", "COM") ?? "UDP";
+            txtRemoteIP.Text = ini.Read("txtRemoteIP", "COM") ?? cbbLocalIP.Text;
+            txtRemotePort.Text = ini.Read("txtRemotePort", "COM") ?? "80";
+            txtLocalPort.Text = ini.Read("txtLocalPort", "COM") ?? "777";
 
 
 
@@ -333,7 +356,7 @@ namespace ZuartControl
             ini.Write("cbbLocalIP", cbbLocalIP.Text, "COM");
             ini.Write("txtLocalPort", txtLocalPort.Text, "COM");
 
-            if (txtSendData != null) ini.Write("txtSendData", txtSendData.Text, "COM");
+            if (txtSendData != null) ini.Write("txtSendData", (txtSendData.Tag ?? txtSendData.Text).ToString(), "COM");
             ini.Write("txtAutoSendms", txtAutoSendms.Text, "COM");
 
             ini.Write("chkAutoLine", chkAutoLine.Checked.ToString(), "COM");
@@ -581,34 +604,175 @@ namespace ZuartControl
 
 
         #region 选择编码发送字符串
-        public bool SendStr(String str)
-        {
-            return SendStr(str, false);
-        }
         public bool SendStr(String str, bool ishex)
         {
-
+            String str_bak = str;
             byte[] sendData = null;
+
+            #region 转义字符的处理
+            if (chkTrans.Checked && !ishex)
+            {//转义字符的处理
+                string s = "";
+                char c_temp = (char)0;
+                int is_trans_status = 0;
+                foreach (char c in str)
+                {
+                    switch (is_trans_status)
+                    {
+                        case 0:
+                            {
+                                if (c != '\\')
+                                {
+                                    s += c;
+                                }
+                                else
+                                {
+                                    is_trans_status = 1;
+                                }
+                                c_temp = (char)0;
+                                continue;
+                            }
+                        case 1:
+                            switch (c)
+                            {
+                                case 'a': s += '\x07'; is_trans_status = 0; break;
+                                case 'b': s += '\x08'; is_trans_status = 0; break;
+                                case 'f': s += '\x0C'; is_trans_status = 0; break;
+                                case 'n': s += '\x0A'; is_trans_status = 0; break;
+                                case 'r': s += '\x0D'; is_trans_status = 0; break;
+                                case 't': s += '\x09'; is_trans_status = 0; break;
+                                case 'v': s += '\x0B'; is_trans_status = 0; break;
+                                case '\\': s += '\\'; is_trans_status = 0; break;
+                                case '\'': s += '\''; is_trans_status = 0; break;
+                                case '\"': s += '\x22'; is_trans_status = 0; break;
+                                case '?': s += '?'; is_trans_status = 0; break;
+                                //case '0': s += '\x00'; is_trans_status = 0; break;
+                                case 'x': is_trans_status = 2; break;
+                                case '0': goto CASE_7;
+                                case '1': goto CASE_7;
+                                case '2': goto CASE_7;
+                                case '3': goto CASE_7;
+                                case '4': goto CASE_7;
+                                case '5': goto CASE_7;
+                                case '6': goto CASE_7;
+                                case '7':
+                                CASE_7:
+                                    c_temp = (char)(c - '0');
+                                    is_trans_status = 4;
+                                    break;
+                                default:
+                                    s += c;
+                                    is_trans_status = 0;
+                                    break;
+                            }
+                            break;
+                        case 2:
+                            {
+                                is_trans_status++;
+                                if (c <= 'F' && c >= 'A')
+                                {
+                                    c_temp = (char)(c - 'A' + 10);
+                                }
+                                else if (c <= 'f' && c >= 'a')
+                                {
+                                    c_temp = (char)(c - 'a' + 10);
+                                }
+                                if (c <= '9' && c >= '0')
+                                {
+                                    c_temp = (char)(c - '0');
+                                }
+                                else
+                                {   //\x后非十六进制,着则忽略\符号
+                                    s += 'x' + c;
+                                    is_trans_status = 0;
+                                }
+                            }
+                            break;
+                        case 3:
+                            {
+                                if (c <= 'F' && c >= 'A')
+                                {
+                                    c_temp = (char)(c_temp * 16 + (c - 'A' + 10));
+                                }
+                                else if (c <= 'f' && c >= 'a')
+                                {
+                                    c_temp = (char)(c_temp * 16 + (c - 'a' + 10));
+                                }
+                                if (c <= '9' && c >= '0')
+                                {
+                                    c_temp = (char)(c_temp * 16 + (c - '0'));
+                                }
+
+                                s += c_temp;
+
+                                if (!((c <= 'F' && c >= 'A') || (c <= 'f' && c >= 'a') || (c <= '9' && c >= '0')))
+                                {
+                                    s += c;
+                                }
+
+                                is_trans_status = 0;
+                            }
+                            break;
+
+                        case 4://\d[d]
+                            {
+                                if (c < '8' && c >= '0')
+                                {
+                                    c_temp = (char)(c_temp * 8 + c - '0');
+                                    is_trans_status++;
+                                }
+                                else
+                                {   //\d后非8进制
+                                    s += c_temp;
+                                    s += c;
+                                    is_trans_status = 0;
+                                }
+                            }
+                            break;
+                        case 5: //\dd[d]最后一个字符
+                            {
+                                if (c < '8' && c >= '0')
+                                {
+                                    c_temp = (char)(c_temp * 8 + c - '0');
+                                }
+                                s += c_temp;
+
+                                if (!(c < '8' && c >= '0'))
+                                {
+                                    s += c;
+                                }
+                                is_trans_status = 0;
+                            }
+                            break;
+                    }
+                }
+
+                if (is_trans_status >= 2 && is_trans_status <= 5) s += c_temp;
+
+
+                str = s;
+                //str = Regex.Replace(str, @"(?<!\\)\\a", "\a");
+                //str = Regex.Replace(str, @"(?<!\\)\\b", "\b");
+                //str = Regex.Replace(str, @"(?<!\\)\\f", "\f");
+                //str = Regex.Replace(str, @"(?<!\\)\\n", "\n");
+                //str = Regex.Replace(str, @"(?<!\\)\\r", "\r");
+                //str = Regex.Replace(str, @"(?<!\\)\\t", "\t");
+                //str = Regex.Replace(str, @"(?<!\\)\\v", "\v");
+                //str = Regex.Replace(str, @"(?<!\\)\\\\", "\\");
+                //str = Regex.Replace(str, @"(?<!\\)\\'", "\'");
+                //str = Regex.Replace(str, @"(?<!\\)\\""", "\"");
+                //str = Regex.Replace(str, @"(?<!\\)\\?", "?");
+                //str = Regex.Replace(str, @"(?<!\\)\\0", "\0");
+
+
+            }
+            #endregion
 
             if (ishex)
             {
                 try
                 {
-                    sendData = strToHexByte(str.Trim());
-
-                    if (chkShowTime.Checked)
-                    {
-                        if (rtxShowData.Text.Length > 0)
-                        {
-                            rtxShowData.AppendText("\r\n");
-                        }
-                        rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
-                        rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Hex:" + "\r\n");
-                        rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
-                        rtxShowData.AppendText(str.Trim());
-                        if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
-                    }
-
+                    sendData = sendData = strToHexByte(str.Trim());
                 }
                 catch (Exception)
                 {
@@ -617,196 +781,49 @@ namespace ZuartControl
                     return false;
                 }
             }
+            else if (rbtnSendASCII.Checked)
+            {
+                //sendData = Encoding.ASCII.GetBytes(str);
+                sendData = Encoding.GetEncoding("GBK").GetBytes(str);
+            }
+            else if (rbtnSendUTF8.Checked)
+            {
+                sendData = Encoding.UTF8.GetBytes(str);
+            }
+            else if (rbtnSendUnicode.Checked)
+            {
+                sendData = Encoding.Unicode.GetBytes(str);
+            }
             else
             {
-                if (chkShowTime.Checked)
+                sendData = Encoding.GetEncoding("GBK").GetBytes(str);
+            }
+
+            //显示日志信息
+            if (chkShowTime.Checked)
+            {
+                string data_str = $"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}] Send ";
+
+
+                if (rtxShowData.Text.Length > 0) data_str = "\r\n" + data_str;
+                data_str = data_str + (ishex ? "Hex" : "Str");
+
+                if (tabControlComNet.SelectedTab == tabComSetting)  //串口发送
                 {
-                    if (rtxShowData.Text.Length > 0)
-                    {
-                        rtxShowData.AppendText("\r\n");
-                    }
-                    rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
-                    rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Send Str:" + "\r\n");
-                    rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
-                    rtxShowData.AppendText(str);
-                    if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
+                    data_str = data_str + ": ";
                 }
-
-                #region 转义字符的处理
-                if (chkTrans.Checked)
-                {//转义字符的处理
-                    string s = "";
-                    char c_temp = (char)0;
-                    int is_trans_status = 0;
-                    foreach (char c in str)
-                    {
-                        switch (is_trans_status)
-                        {
-                            case 0:
-                                {
-                                    if (c != '\\')
-                                    {
-                                        s += c;
-                                    }
-                                    else
-                                    {
-                                        is_trans_status = 1;
-                                    }
-                                    c_temp = (char)0;
-                                    continue;
-                                }
-                            case 1:
-                                switch (c)
-                                {
-                                    case 'a': s += '\x07'; is_trans_status = 0; break;
-                                    case 'b': s += '\x08'; is_trans_status = 0; break;
-                                    case 'f': s += '\x0C'; is_trans_status = 0; break;
-                                    case 'n': s += '\x0A'; is_trans_status = 0; break;
-                                    case 'r': s += '\x0D'; is_trans_status = 0; break;
-                                    case 't': s += '\x09'; is_trans_status = 0; break;
-                                    case 'v': s += '\x0B'; is_trans_status = 0; break;
-                                    case '\\': s += '\\'; is_trans_status = 0; break;
-                                    case '\'': s += '\''; is_trans_status = 0; break;
-                                    case '\"': s += '\x22'; is_trans_status = 0; break;
-                                    case '?': s += '?'; is_trans_status = 0; break;
-                                    //case '0': s += '\x00'; is_trans_status = 0; break;
-                                    case 'x': is_trans_status = 2; break;
-                                    case '0': goto CASE_7;
-                                    case '1': goto CASE_7;
-                                    case '2': goto CASE_7;
-                                    case '3': goto CASE_7;
-                                    case '4': goto CASE_7;
-                                    case '5': goto CASE_7;
-                                    case '6': goto CASE_7;
-                                    case '7':
-                                    CASE_7:
-                                        c_temp = (char)(c - '0');
-                                        is_trans_status = 4;
-                                        break;
-                                    default:
-                                        s += c;
-                                        is_trans_status = 0;
-                                        break;
-                                }
-                                break;
-                            case 2:
-                                {
-                                    is_trans_status++;
-                                    if (c <= 'F' && c >= 'A')
-                                    {
-                                        c_temp = (char)(c - 'A' + 10);
-                                    }
-                                    else if (c <= 'f' && c >= 'a')
-                                    {
-                                        c_temp = (char)(c - 'a' + 10);
-                                    }
-                                    if (c <= '9' && c >= '0')
-                                    {
-                                        c_temp = (char)(c - '0');
-                                    }
-                                    else
-                                    {   //\x后非十六进制,着则忽略\符号
-                                        s += 'x' + c;
-                                        is_trans_status = 0;
-                                    }
-                                }
-                                break;
-                            case 3:
-                                {
-                                    if (c <= 'F' && c >= 'A')
-                                    {
-                                        c_temp = (char)(c_temp * 16 + (c - 'A' + 10));
-                                    }
-                                    else if (c <= 'f' && c >= 'a')
-                                    {
-                                        c_temp = (char)(c_temp * 16 + (c - 'a' + 10));
-                                    }
-                                    if (c <= '9' && c >= '0')
-                                    {
-                                        c_temp = (char)(c_temp * 16 + (c - '0'));
-                                    }
-
-                                    s += c_temp;
-
-                                    if (!((c <= 'F' && c >= 'A') || (c <= 'f' && c >= 'a') || (c <= '9' && c >= '0')))
-                                    {
-                                        s += c;
-                                    }
-
-                                    is_trans_status = 0;
-                                }
-                                break;
-
-                            case 4://\d[d]
-                                {
-                                    if (c < '8' && c >= '0')
-                                    {
-                                        c_temp = (char)(c_temp * 8 + c - '0');
-                                        is_trans_status++;
-                                    }
-                                    else
-                                    {   //\d后非8进制
-                                        s += c_temp;
-                                        s += c;
-                                        is_trans_status = 0;
-                                    }
-                                }
-                                break;
-                            case 5: //\dd[d]最后一个字符
-                                {
-                                    if (c < '8' && c >= '0')
-                                    {
-                                        c_temp = (char)(c_temp * 8 + c - '0');
-                                    }
-                                    s += c_temp;
-
-                                    if (!(c < '8' && c >= '0'))
-                                    {
-                                        s += c;
-                                    }
-                                    is_trans_status = 0;
-                                }
-                                break;
-                        }
-                    }
-
-                    if (is_trans_status >= 2 && is_trans_status <= 5) s += c_temp;
-
-
-                    str = s;
-                    //str = Regex.Replace(str, @"(?<!\\)\\a", "\a");
-                    //str = Regex.Replace(str, @"(?<!\\)\\b", "\b");
-                    //str = Regex.Replace(str, @"(?<!\\)\\f", "\f");
-                    //str = Regex.Replace(str, @"(?<!\\)\\n", "\n");
-                    //str = Regex.Replace(str, @"(?<!\\)\\r", "\r");
-                    //str = Regex.Replace(str, @"(?<!\\)\\t", "\t");
-                    //str = Regex.Replace(str, @"(?<!\\)\\v", "\v");
-                    //str = Regex.Replace(str, @"(?<!\\)\\\\", "\\");
-                    //str = Regex.Replace(str, @"(?<!\\)\\'", "\'");
-                    //str = Regex.Replace(str, @"(?<!\\)\\""", "\"");
-                    //str = Regex.Replace(str, @"(?<!\\)\\?", "?");
-                    //str = Regex.Replace(str, @"(?<!\\)\\0", "\0");
-
-                    #endregion
-
-                }
-                if (rbtnSendASCII.Checked)
+                if (tabControlComNet.SelectedTab == tabNetSetting)  //网络发送
                 {
-                    //sendData = Encoding.ASCII.GetBytes(str);
-                    sendData = Encoding.GetEncoding("GBK").GetBytes(str);
+                    data_str = data_str + $" to:{txtRemoteIP.Text}:{txtRemotePort.Text} ";
                 }
-                else if (rbtnSendUTF8.Checked)
-                {
-                    sendData = Encoding.UTF8.GetBytes(str);
-                }
-                else if (rbtnSendUnicode.Checked)
-                {
-                    sendData = Encoding.Unicode.GetBytes(str);
-                }
-                else
-                {
-                    sendData = Encoding.GetEncoding("GBK").GetBytes(str);
-                }
+                data_str = data_str + ">\r\n";
+
+                rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
+                rtxShowData.AppendText(data_str);
+                rtxShowData.SelectionColor = Color.FromArgb(0X0000FF);
+
+                rtxShowData.AppendText(ishex ? BitConverter.ToString(sendData, 0).Replace("-", " ") : str_bak);
+                if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
             }
 
             if (this.SendData(sendData))//发送数据成功计数
@@ -831,12 +848,12 @@ namespace ZuartControl
         #endregion
 
         #region 接收数据监听
-        private void DataReceived(byte[] ReDatas)
+        private void DataReceived(byte[] ReDatas, string from)
         {
             this.BeginInvoke(new MethodInvoker(delegate
             {
                 RevCount += (UInt64)ReDatas.Length;
-                string str = this.AddData(ReDatas);//输出数据
+                string str = this.AddData(ReDatas, from);//输出数据
                 ComData_EventArgs comDataReceived_EventArgs = new ComData_EventArgs();
                 comDataReceived_EventArgs.data = ReDatas;
                 comDataReceived_EventArgs.recived_string = str;
@@ -848,8 +865,8 @@ namespace ZuartControl
         {
             byte[] ReDatas = new byte[ComDevice.BytesToRead];
             ComDevice.Read(ReDatas, 0, ReDatas.Length);//读取数据
-            DataReceived(ReDatas);
-        } 
+            DataReceived(ReDatas, ComDevice.PortName);
+        }
         #endregion
         #endregion
         #region 接收文本框,输入监听,供输入直接发送
@@ -944,12 +961,12 @@ namespace ZuartControl
             }
             return str;
         }
-        public string AddData(byte[] data)
+        public string AddData(byte[] data, string from)
         {
             string str;
             str = Byte2String(data);
             if (chkIsShow.Checked) return str;
-            AddContent(str);
+            AddContent(str, from);
             return str;
         }
 
@@ -959,32 +976,37 @@ namespace ZuartControl
         //输入到显示区域
         public void AddContent(string content)
         {
-            AddContent(content, true);
+            AddContent(content, true, null);
         }
-        public void AddContent(string content, bool isChkAutoLine)
+        public void AddContent(string content, string from)
+        {
+            AddContent(content, true, from);
+        }
+        public void AddContent(string content, bool isChkAutoLine, string from)
         {
             //this.BeginInvoke(new MethodInvoker(delegate
             //{
-            string str = "";
             if (rtxShowData == null) return;
 
             if (chkAutoLine.Checked && rtxShowData.Text.Length > 0 && isChkAutoLine)
             {
-                //str = "\r\n";
                 rtxShowData.AppendText("\r\n");
             }
 
             if (chkShowTime.Checked)
             {
-                //str += " [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "] Rec:" + "\r\n";
+                if (!rtxShowData.Text.EndsWith("\n")) rtxShowData.AppendText("\r\n");
+                string str = "";
+                if (!String.IsNullOrWhiteSpace(from))
+                {
+                    str = $"RECV From {from}";
+                }
                 rtxShowData.SelectionColor = Color.FromArgb(0X6d6d6d);
-                rtxShowData.AppendText(" [" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "]" + "\r\n");
+                rtxShowData.AppendText($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}] {str}\r\n");
             }
 
             rtxShowData.SelectionColor = Color.FromArgb(0X008000);
-            str += content;
-
-            rtxShowData.AppendText(str);
+            rtxShowData.AppendText(content);
             if (chkAutoScroll.Checked) rtxShowData.ScrollToCaret();//将滚动条滚动到当前焦点处
 
             //}));
@@ -1074,6 +1096,7 @@ namespace ZuartControl
             if (txtSendData.Enabled)
             {
                 txtSendData.Text = (string)txtSendData.Tag;
+                txtSendData.Tag = null;
                 SendFileName = null;
             }
 
@@ -1167,7 +1190,7 @@ namespace ZuartControl
                 ((Timer)sender).Enabled = false;
                 this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
             }
-        } 
+        }
         #endregion
 
         #region 串口/网络界面事件监听
@@ -1180,6 +1203,27 @@ namespace ZuartControl
                     AddContent("请先关闭串口\r\n");
                     tabControlComNet.SelectedTab = tabComSetting;
                 }
+            }
+            else if (IsNetOpen)
+            {
+                if (tabControlComNet.SelectedTab != tabNetSetting)
+                {
+                    AddContent("请先关闭网络通信\r\n");
+                    tabControlComNet.SelectedTab = tabNetSetting;
+                }
+            }
+        }
+        private void tabControlComNet_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            if (e.TabPage != tabComSetting && IsComOpen)
+            {
+                AddContent("请先关闭串口\r\n");
+                e.Cancel = true;
+            }
+            else if (e.TabPage != tabNetSetting && IsNetOpen)
+            {
+                AddContent("请先关闭网络通信\r\n");
+                e.Cancel = true;
             }
         }
         #endregion
@@ -1233,6 +1277,18 @@ namespace ZuartControl
                     }
             }
         }
+
+        private void cbbClient_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(cbbClient.Text))
+            {
+                txtRemoteIP.Text = "";
+                return;
+            }
+            string[] str = cbbClient.Text.Split(':');
+            txtRemoteIP.Text = str[0];
+            txtRemotePort.Text = str[1];
+        }
         #endregion
 
         Thread thread_net = null; //负责监听客户端的线程
@@ -1241,20 +1297,120 @@ namespace ZuartControl
         {
             try
             {
-                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                socket.Bind(new IPEndPoint(IPAddress.Parse(cbbLocalIP.Text), Convert.ToInt32(txtLocalPort.Text)));//绑定端口号和IP
+                if (btNetOpen.Text.Contains("打开"))
+                {
+                    switch (cbbNetList.Text)
+                    {
+                        case "UDP":
+                            {
+                                //UDP
+                                cbbClient.Items.Clear();
+                                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                                socket.Bind(new IPEndPoint(IPAddress.Parse(cbbLocalIP.Text), Convert.ToInt32(txtLocalPort.Text)));//绑定端口号和IP  //socket.ReceiveTimeout = 500;                                                                                    
+                                thread_net = new Thread(ReciveMsg); //开启接收消息线程
+                                thread_net.IsBackground = true;
+                                thread_net.Start();//启动线程
+                                break;
+                            }
+                        case "TCP Client":
+                            {
+                                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                                socket.Connect(new IPEndPoint(IPAddress.Parse(txtRemoteIP.Text), Convert.ToInt32(txtRemotePort.Text)));
 
-                //开启接收消息线程
-                thread_net = new Thread(ReciveMsg);
-                thread_net.IsBackground = true;
-                thread_net.Start();//启动线程
+                                //Console.WriteLine("连接成功:" + endPoint);
+                                thread_net = new Thread(ReciveMsg); //开启接收消息线程
+                                thread_net.IsBackground = true;
+                                thread_net.Start();//启动线程
+                                break;
+                            }
+                        case "TCP Server":
+                            {
+
+                                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                                //允许监听任何ip
+                                socket.Bind(new IPEndPoint(IPAddress.Any, Convert.ToInt32(txtLocalPort.Text)));//绑定监听的ip及端口
+                                socket.Listen(16);
+                                thread_net = new Thread(ReciveMsgTcpServer); //开启接收消息线程
+                                thread_net.IsBackground = true;
+                                thread_net.Start();//启动线程
+
+                                break;
+                            }
+                    }
+
+
+                }
+                else
+                {
+                    socket.Close();
+                    socket = null;
+
+                }
             }
-            catch (Exception)
+            catch (Exception e1)
             {
                 //throw;
+                AddContent(e1.Message);
+                socket.Close();
+                socket = null;
+
+            }
+            finally
+            {
+                if (socket == null)
+                {
+                    if (btnSend != null)
+                        btnSend.Enabled = false;
+                    btNetOpen.Text = "打开网络";
+                    btNetOpen.Image = Properties.Resources.close;
+                    cbbLocalIP.Enabled = true;
+                    txtLocalPort.Enabled = true;
+                    txtRemoteIP.Enabled = true;
+                    txtRemotePort.Enabled = true;
+                    cbbNetList.Enabled = true;
+                    cbbNetList_SelectedIndexChanged(null, null);
+                    Log("网络服务已关闭");
+                }
+                else
+                {
+                    if (btnSend != null)
+                        btnSend.Enabled = true;
+                    btNetOpen.Text = "关闭网络";
+                    btNetOpen.Image = Properties.Resources.open;
+                    switch (cbbNetList.Text)
+                    {
+                        case "UDP":
+                            {
+                                cbbLocalIP.Enabled = false;
+                                txtLocalPort.Enabled = false;
+                                cbbNetList.Enabled = false;
+                                Log($"UDP监听:{cbbLocalIP.Text}:{txtLocalPort.Text}");
+                                break;
+                            }
+                        case "TCP Client":
+                            {
+                                cbbLocalIP.Enabled = false;
+                                txtLocalPort.Enabled = false;
+                                txtRemoteIP.Enabled = false;
+                                txtRemotePort.Enabled = false;
+                                cbbNetList.Enabled = false;
+                                Log($"TCP Client 连接:{txtRemoteIP.Text}:{txtRemotePort.Text}");
+                                break;
+                            }
+                        case "TCP Server":
+                            {
+                                cbbLocalIP.Enabled = false;
+                                txtLocalPort.Enabled = false;
+                                Log($"TCP Server 监听:{cbbLocalIP.Text}:{txtLocalPort.Text}");
+                                break;
+                            }
+                    }
+                }
 
             }
         }
+
         /// <summary>
         /// 接收发送给本机ip对应端口号的数据报
         /// </summary>
@@ -1262,16 +1418,89 @@ namespace ZuartControl
         {
             while (true)
             {
-                EndPoint point = new IPEndPoint(IPAddress.Any, 0);//用来保存发送方的ip和端口号
-                byte[] buffer = new byte[1024];
-                int length = socket.ReceiveFrom(buffer, ref point);//接收数据报
-                byte[] reBuffer = new byte[length];
-                Array.Copy(buffer, reBuffer, length);
-                DataReceived(reBuffer);
-                string message = Encoding.UTF8.GetString(buffer, 0, length);
-                Console.WriteLine(point.ToString() + message);
 
+                try
+                {
+                    if (!IsNetOpen) break;
+                    EndPoint point = new IPEndPoint(IPAddress.Any, 0);//用来保存发送方的ip和端口号
+                    byte[] buffer = new byte[socket.ReceiveBufferSize];
+                    int length = socket.ReceiveFrom(buffer, 0, buffer.Length, SocketFlags.None, ref point);//接收数据包
+                    if (length < 1) continue;
+                    byte[] reBuffer = new byte[length];
+                    Array.Copy(buffer, reBuffer, length);
+                    this.BeginInvoke(new MethodInvoker(delegate
+                    {
+                        if (socket.ProtocolType == ProtocolType.Udp)
+                        {
+                            if (!cbbClient.Items.Contains(point.ToString())) cbbClient.Items.Add(point.ToString());
+                            cbbClient.SelectedItem = (point.ToString());
+                        }
+                        DataReceived(reBuffer, point.ToString());
+                    }));
+                }
+                catch (SocketException e)
+                {
+                    //throw;
+                    if (e.ErrorCode != 0x00002714) MessageBox.Show($"网络断开:{e.Message}", "网络错误");
+                    break;
+                }
             }
+        }
+        private void ReciveMsgTcpServer()
+        {
+            //if (!IsNetOpen) return;
+
+            try
+            {
+                Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]线程启动");
+                
+                Socket client = socket.Accept();//开始监听
+
+                Console.WriteLine($"客户端连接 {client.RemoteEndPoint}");
+                this.BeginInvoke(new MethodInvoker(delegate
+                {
+                    if (!cbbClient.Items.Contains(client.RemoteEndPoint.ToString())) cbbClient.Items.Add(client.RemoteEndPoint.ToString());
+                    cbbClient.SelectedItem = (client.RemoteEndPoint.ToString());
+                }));
+                thread_net = new Thread(ReciveMsgTcpServer); //开启接收消息线程
+                thread_net.IsBackground = true;
+                thread_net.Start();//启动线程
+                while (true)
+                {
+                    Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]开始监听数据 {client.Poll(10, SelectMode.SelectRead)}");
+                    try
+                    {
+                        if(client.Poll(1000, SelectMode.SelectRead) && client.Available == 0)
+                        {
+                            break;
+                        }
+                        byte[] buffer = new byte[socket.ReceiveBufferSize];
+                        int length = client.Receive(buffer, buffer.Length, SocketFlags.None);
+                        if (length < 1) continue;
+                        byte[] reBuffer = new byte[length];
+                        Array.Copy(buffer, reBuffer, length);
+                        DataReceived(reBuffer, client.RemoteEndPoint.ToString());
+                    }
+                    catch (SocketException e)
+                    {
+                        //throw;
+                        if (e.ErrorCode != 0x00002714) MessageBox.Show($"[{Thread.CurrentThread.ManagedThreadId}] 网络断开:{e.Message}", "网络错误");
+                        break;
+                    }
+                }
+                this.BeginInvoke(new MethodInvoker(delegate
+                {
+                    if ((String)(cbbClient.SelectedItem) == client.RemoteEndPoint.ToString()) cbbClient.SelectedIndex = cbbClient.SelectedIndex - 1;
+                    if (cbbClient.Items.Contains(client.RemoteEndPoint.ToString())) cbbClient.Items.Remove(client.RemoteEndPoint.ToString());
+                }));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]错误:{e.Message}");
+                throw;
+            }
+
+            Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]设备断开,接收监听线程退出");
         }
 
         #endregion

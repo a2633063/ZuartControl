@@ -59,7 +59,17 @@
             this.cbbComList = new System.Windows.Forms.ComboBox();
             this.cbbBaudRate = new System.Windows.Forms.ComboBox();
             this.tabNetSetting = new System.Windows.Forms.TabPage();
+            this.btNetOpen = new System.Windows.Forms.Button();
+            this.cbbClient = new System.Windows.Forms.ComboBox();
+            this.cbbLocalIP = new System.Windows.Forms.ComboBox();
+            this.txtLocalPort = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtRemotePort = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txtRemoteIP = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.cbbNetList = new System.Windows.Forms.ComboBox();
             this.groupboxSendSetting = new System.Windows.Forms.GroupBox();
@@ -84,16 +94,6 @@
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.timerDelay = new System.Windows.Forms.Timer(this.components);
-            this.txtRemoteIP = new System.Windows.Forms.TextBox();
-            this.txtRemotePort = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.txtLocalPort = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.cbbLocalIP = new System.Windows.Forms.ComboBox();
-            this.btNetOpen = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.cbbClient = new System.Windows.Forms.ComboBox();
             this.panel_Setting.SuspendLayout();
             this.groupboxRecSetting.SuspendLayout();
             this.tabControlComNet.SuspendLayout();
@@ -284,6 +284,7 @@
             this.tabControlComNet.Size = new System.Drawing.Size(170, 213);
             this.tabControlComNet.TabIndex = 4;
             this.tabControlComNet.SelectedIndexChanged += new System.EventHandler(this.tabControlComNet_SelectedIndexChanged);
+            this.tabControlComNet.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControlComNet_Selecting);
             // 
             // tabComSetting
             // 
@@ -307,7 +308,7 @@
             this.tabComSetting.Padding = new System.Windows.Forms.Padding(3);
             this.tabComSetting.Size = new System.Drawing.Size(162, 187);
             this.tabComSetting.TabIndex = 0;
-            this.tabComSetting.Text = "端口设置";
+            this.tabComSetting.Text = "串口设置";
             // 
             // chkDTR
             // 
@@ -473,6 +474,7 @@
             this.cbbComList.Size = new System.Drawing.Size(101, 20);
             this.cbbComList.TabIndex = 1;
             this.cbbComList.DropDown += new System.EventHandler(this.cbbComList_DropDown);
+            this.cbbComList.SelectedIndexChanged += new System.EventHandler(this.cbbComSetChange);
             this.cbbComList.TextChanged += new System.EventHandler(this.cbbComSetChange);
             // 
             // cbbBaudRate
@@ -530,6 +532,103 @@
             this.tabNetSetting.TabIndex = 1;
             this.tabNetSetting.Text = "网络设置";
             // 
+            // btNetOpen
+            // 
+            this.btNetOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btNetOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btNetOpen.Font = new System.Drawing.Font("宋体", 10F);
+            this.btNetOpen.Image = global::ZuartControl.Properties.Resources.close;
+            this.btNetOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btNetOpen.Location = new System.Drawing.Point(0, 139);
+            this.btNetOpen.Margin = new System.Windows.Forms.Padding(4);
+            this.btNetOpen.Name = "btNetOpen";
+            this.btNetOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
+            this.btNetOpen.Size = new System.Drawing.Size(162, 41);
+            this.btNetOpen.TabIndex = 9;
+            this.btNetOpen.Text = " 打开服务";
+            this.btNetOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btNetOpen.UseVisualStyleBackColor = true;
+            this.btNetOpen.Click += new System.EventHandler(this.btNetOpen_Click);
+            // 
+            // cbbClient
+            // 
+            this.cbbClient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbClient.DisplayMember = "1";
+            this.cbbClient.Location = new System.Drawing.Point(4, 116);
+            this.cbbClient.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbClient.Name = "cbbClient";
+            this.cbbClient.Size = new System.Drawing.Size(152, 20);
+            this.cbbClient.TabIndex = 3;
+            this.cbbClient.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
+            this.cbbClient.SelectedIndexChanged += new System.EventHandler(this.cbbClient_SelectedIndexChanged);
+            this.cbbClient.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
+            // 
+            // cbbLocalIP
+            // 
+            this.cbbLocalIP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbLocalIP.DisplayMember = "1";
+            this.cbbLocalIP.Location = new System.Drawing.Point(4, 78);
+            this.cbbLocalIP.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbLocalIP.Name = "cbbLocalIP";
+            this.cbbLocalIP.Size = new System.Drawing.Size(108, 20);
+            this.cbbLocalIP.TabIndex = 3;
+            this.cbbLocalIP.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
+            this.cbbLocalIP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
+            // 
+            // txtLocalPort
+            // 
+            this.txtLocalPort.Location = new System.Drawing.Point(117, 78);
+            this.txtLocalPort.MaxLength = 5;
+            this.txtLocalPort.Name = "txtLocalPort";
+            this.txtLocalPort.Size = new System.Drawing.Size(39, 21);
+            this.txtLocalPort.TabIndex = 4;
+            this.txtLocalPort.Text = "777";
+            this.toolTip1.SetToolTip(this.txtLocalPort, "填0为自动");
+            this.txtLocalPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(7, 100);
+            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(53, 12);
+            this.label11.TabIndex = 2;
+            this.label11.Text = "4.客户端";
+            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // txtRemotePort
+            // 
+            this.txtRemotePort.Location = new System.Drawing.Point(118, 39);
+            this.txtRemotePort.MaxLength = 5;
+            this.txtRemotePort.Name = "txtRemotePort";
+            this.txtRemotePort.Size = new System.Drawing.Size(39, 21);
+            this.txtRemotePort.TabIndex = 4;
+            this.txtRemotePort.Text = "80";
+            this.txtRemotePort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 63);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(89, 12);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "3.本地主机地址";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // txtRemoteIP
+            // 
+            this.txtRemoteIP.Location = new System.Drawing.Point(4, 39);
+            this.txtRemoteIP.Name = "txtRemoteIP";
+            this.txtRemoteIP.Size = new System.Drawing.Size(108, 21);
+            this.txtRemoteIP.TabIndex = 4;
+            this.txtRemoteIP.Text = "255.255.255.255";
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -540,6 +639,28 @@
             this.label7.TabIndex = 2;
             this.label7.Text = "2.远程主机地址";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(110, 82);
+            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(11, 12);
+            this.label10.TabIndex = 2;
+            this.label10.Text = ":";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(110, 43);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(11, 12);
+            this.label8.TabIndex = 2;
+            this.label8.Text = ":";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label6
             // 
@@ -800,124 +921,6 @@
             // 
             this.timerDelay.Enabled = true;
             this.timerDelay.Tick += new System.EventHandler(this.timerDelay_Tick);
-            // 
-            // txtRemoteIP
-            // 
-            this.txtRemoteIP.Location = new System.Drawing.Point(4, 39);
-            this.txtRemoteIP.Name = "txtRemoteIP";
-            this.txtRemoteIP.Size = new System.Drawing.Size(108, 21);
-            this.txtRemoteIP.TabIndex = 4;
-            this.txtRemoteIP.Text = "255.255.255.255";
-            // 
-            // txtRemotePort
-            // 
-            this.txtRemotePort.Location = new System.Drawing.Point(118, 39);
-            this.txtRemotePort.MaxLength = 5;
-            this.txtRemotePort.Name = "txtRemotePort";
-            this.txtRemotePort.Size = new System.Drawing.Size(39, 21);
-            this.txtRemotePort.TabIndex = 4;
-            this.txtRemotePort.Text = "80";
-            this.txtRemotePort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(110, 43);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(11, 12);
-            this.label8.TabIndex = 2;
-            this.label8.Text = ":";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 63);
-            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(89, 12);
-            this.label9.TabIndex = 2;
-            this.label9.Text = "3.本地主机地址";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // txtLocalPort
-            // 
-            this.txtLocalPort.Location = new System.Drawing.Point(117, 78);
-            this.txtLocalPort.MaxLength = 5;
-            this.txtLocalPort.Name = "txtLocalPort";
-            this.txtLocalPort.Size = new System.Drawing.Size(39, 21);
-            this.txtLocalPort.TabIndex = 4;
-            this.txtLocalPort.Text = "777";
-            this.toolTip1.SetToolTip(this.txtLocalPort, "填0为自动");
-            this.txtLocalPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(110, 82);
-            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(11, 12);
-            this.label10.TabIndex = 2;
-            this.label10.Text = ":";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // cbbLocalIP
-            // 
-            this.cbbLocalIP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbLocalIP.DisplayMember = "1";
-            this.cbbLocalIP.Location = new System.Drawing.Point(4, 78);
-            this.cbbLocalIP.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbLocalIP.Name = "cbbLocalIP";
-            this.cbbLocalIP.Size = new System.Drawing.Size(108, 20);
-            this.cbbLocalIP.TabIndex = 3;
-            this.cbbLocalIP.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
-            this.cbbLocalIP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
-            // 
-            // btNetOpen
-            // 
-            this.btNetOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btNetOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btNetOpen.Font = new System.Drawing.Font("宋体", 10F);
-            this.btNetOpen.Image = global::ZuartControl.Properties.Resources.close;
-            this.btNetOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btNetOpen.Location = new System.Drawing.Point(0, 139);
-            this.btNetOpen.Margin = new System.Windows.Forms.Padding(4);
-            this.btNetOpen.Name = "btNetOpen";
-            this.btNetOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
-            this.btNetOpen.Size = new System.Drawing.Size(162, 41);
-            this.btNetOpen.TabIndex = 9;
-            this.btNetOpen.Text = " 打开服务";
-            this.btNetOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btNetOpen.UseVisualStyleBackColor = true;
-            this.btNetOpen.Click += new System.EventHandler(this.btNetOpen_Click);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(7, 100);
-            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(53, 12);
-            this.label11.TabIndex = 2;
-            this.label11.Text = "4.客户端";
-            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // cbbClient
-            // 
-            this.cbbClient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbClient.DisplayMember = "1";
-            this.cbbClient.Location = new System.Drawing.Point(4, 116);
-            this.cbbClient.Margin = new System.Windows.Forms.Padding(4);
-            this.cbbClient.Name = "cbbClient";
-            this.cbbClient.Size = new System.Drawing.Size(152, 20);
-            this.cbbClient.TabIndex = 3;
-            this.cbbClient.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
-            this.cbbClient.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
             // 
             // ZuartControl
             // 
