@@ -53,12 +53,15 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cbbStopBits = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.btnOpen = new System.Windows.Forms.Button();
+            this.btnComOpen = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.cbbDataBits = new System.Windows.Forms.ComboBox();
             this.cbbComList = new System.Windows.Forms.ComboBox();
             this.cbbBaudRate = new System.Windows.Forms.ComboBox();
             this.tabNetSetting = new System.Windows.Forms.TabPage();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.cbbNetList = new System.Windows.Forms.ComboBox();
             this.groupboxSendSetting = new System.Windows.Forms.GroupBox();
             this.chkfromFileSend = new System.Windows.Forms.CheckBox();
             this.txtAutoSendms = new System.Windows.Forms.TextBox();
@@ -81,10 +84,21 @@
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.timerDelay = new System.Windows.Forms.Timer(this.components);
+            this.txtRemoteIP = new System.Windows.Forms.TextBox();
+            this.txtRemotePort = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.txtLocalPort = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.cbbLocalIP = new System.Windows.Forms.ComboBox();
+            this.btNetOpen = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.cbbClient = new System.Windows.Forms.ComboBox();
             this.panel_Setting.SuspendLayout();
             this.groupboxRecSetting.SuspendLayout();
             this.tabControlComNet.SuspendLayout();
             this.tabComSetting.SuspendLayout();
+            this.tabNetSetting.SuspendLayout();
             this.groupboxSendSetting.SuspendLayout();
             this.menuSendKey.SuspendLayout();
             this.SuspendLayout();
@@ -282,7 +296,7 @@
             this.tabComSetting.Controls.Add(this.label4);
             this.tabComSetting.Controls.Add(this.cbbStopBits);
             this.tabComSetting.Controls.Add(this.label5);
-            this.tabComSetting.Controls.Add(this.btnOpen);
+            this.tabComSetting.Controls.Add(this.btnComOpen);
             this.tabComSetting.Controls.Add(this.label2);
             this.tabComSetting.Controls.Add(this.cbbDataBits);
             this.tabComSetting.Controls.Add(this.cbbComList);
@@ -401,24 +415,24 @@
             this.label5.Text = "校验位";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // btnOpen
+            // btnComOpen
             // 
-            this.btnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnComOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnOpen.Font = new System.Drawing.Font("宋体", 10F);
-            this.btnOpen.Image = global::ZuartControl.Properties.Resources.close;
-            this.btnOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnOpen.Location = new System.Drawing.Point(0, 139);
-            this.btnOpen.Margin = new System.Windows.Forms.Padding(4);
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
-            this.btnOpen.Size = new System.Drawing.Size(162, 41);
-            this.btnOpen.TabIndex = 8;
-            this.btnOpen.Text = " 打开串口";
-            this.btnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnOpen.UseVisualStyleBackColor = true;
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            this.btnComOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnComOpen.Font = new System.Drawing.Font("宋体", 10F);
+            this.btnComOpen.Image = global::ZuartControl.Properties.Resources.close;
+            this.btnComOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnComOpen.Location = new System.Drawing.Point(0, 139);
+            this.btnComOpen.Margin = new System.Windows.Forms.Padding(4);
+            this.btnComOpen.Name = "btnComOpen";
+            this.btnComOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
+            this.btnComOpen.Size = new System.Drawing.Size(162, 41);
+            this.btnComOpen.TabIndex = 8;
+            this.btnComOpen.Text = " 打开串口";
+            this.btnComOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnComOpen.UseVisualStyleBackColor = true;
+            this.btnComOpen.Click += new System.EventHandler(this.btnComOpen_Click);
             // 
             // label2
             // 
@@ -453,7 +467,6 @@
             this.cbbComList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbbComList.DisplayMember = "1";
-            this.cbbComList.FormattingEnabled = true;
             this.cbbComList.Location = new System.Drawing.Point(52, 1);
             this.cbbComList.Margin = new System.Windows.Forms.Padding(4);
             this.cbbComList.Name = "cbbComList";
@@ -497,12 +510,64 @@
             // tabNetSetting
             // 
             this.tabNetSetting.BackColor = System.Drawing.SystemColors.Control;
+            this.tabNetSetting.Controls.Add(this.btNetOpen);
+            this.tabNetSetting.Controls.Add(this.cbbClient);
+            this.tabNetSetting.Controls.Add(this.cbbLocalIP);
+            this.tabNetSetting.Controls.Add(this.txtLocalPort);
+            this.tabNetSetting.Controls.Add(this.label11);
+            this.tabNetSetting.Controls.Add(this.txtRemotePort);
+            this.tabNetSetting.Controls.Add(this.label9);
+            this.tabNetSetting.Controls.Add(this.txtRemoteIP);
+            this.tabNetSetting.Controls.Add(this.label7);
+            this.tabNetSetting.Controls.Add(this.label10);
+            this.tabNetSetting.Controls.Add(this.label8);
+            this.tabNetSetting.Controls.Add(this.label6);
+            this.tabNetSetting.Controls.Add(this.cbbNetList);
             this.tabNetSetting.Location = new System.Drawing.Point(4, 22);
             this.tabNetSetting.Name = "tabNetSetting";
             this.tabNetSetting.Padding = new System.Windows.Forms.Padding(3);
             this.tabNetSetting.Size = new System.Drawing.Size(162, 187);
             this.tabNetSetting.TabIndex = 1;
-            this.tabNetSetting.Text = "tabPage2";
+            this.tabNetSetting.Text = "网络设置";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(7, 24);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(89, 12);
+            this.label7.TabIndex = 2;
+            this.label7.Text = "2.远程主机地址";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(7, 6);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(41, 12);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "1.协议";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbNetList
+            // 
+            this.cbbNetList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbNetList.DisplayMember = "1";
+            this.cbbNetList.Items.AddRange(new object[] {
+            "UDP",
+            "TCP Client",
+            "TCP Server"});
+            this.cbbNetList.Location = new System.Drawing.Point(49, 2);
+            this.cbbNetList.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbNetList.Name = "cbbNetList";
+            this.cbbNetList.Size = new System.Drawing.Size(107, 20);
+            this.cbbNetList.TabIndex = 3;
+            this.cbbNetList.SelectedIndexChanged += new System.EventHandler(this.cbbNetList_SelectedIndexChanged);
+            this.cbbNetList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
             // 
             // groupboxSendSetting
             // 
@@ -580,6 +645,7 @@
             // chkTrans
             // 
             this.chkTrans.AutoSize = true;
+            this.chkTrans.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.chkTrans.Location = new System.Drawing.Point(4, 19);
             this.chkTrans.Margin = new System.Windows.Forms.Padding(4);
             this.chkTrans.Name = "chkTrans";
@@ -622,6 +688,7 @@
             this.rbtnSendHex.TabIndex = 6;
             this.rbtnSendHex.Text = "Hex";
             this.rbtnSendHex.UseVisualStyleBackColor = true;
+            this.rbtnSendHex.CheckedChanged += new System.EventHandler(this.rbtnSendHex_CheckedChanged);
             this.rbtnSendHex.Click += new System.EventHandler(this.rbtnSend_Click);
             // 
             // rbtnSendASCII
@@ -734,6 +801,124 @@
             this.timerDelay.Enabled = true;
             this.timerDelay.Tick += new System.EventHandler(this.timerDelay_Tick);
             // 
+            // txtRemoteIP
+            // 
+            this.txtRemoteIP.Location = new System.Drawing.Point(4, 39);
+            this.txtRemoteIP.Name = "txtRemoteIP";
+            this.txtRemoteIP.Size = new System.Drawing.Size(108, 21);
+            this.txtRemoteIP.TabIndex = 4;
+            this.txtRemoteIP.Text = "255.255.255.255";
+            // 
+            // txtRemotePort
+            // 
+            this.txtRemotePort.Location = new System.Drawing.Point(118, 39);
+            this.txtRemotePort.MaxLength = 5;
+            this.txtRemotePort.Name = "txtRemotePort";
+            this.txtRemotePort.Size = new System.Drawing.Size(39, 21);
+            this.txtRemotePort.TabIndex = 4;
+            this.txtRemotePort.Text = "80";
+            this.txtRemotePort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(110, 43);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(11, 12);
+            this.label8.TabIndex = 2;
+            this.label8.Text = ":";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 63);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(89, 12);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "3.本地主机地址";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // txtLocalPort
+            // 
+            this.txtLocalPort.Location = new System.Drawing.Point(117, 78);
+            this.txtLocalPort.MaxLength = 5;
+            this.txtLocalPort.Name = "txtLocalPort";
+            this.txtLocalPort.Size = new System.Drawing.Size(39, 21);
+            this.txtLocalPort.TabIndex = 4;
+            this.txtLocalPort.Text = "777";
+            this.toolTip1.SetToolTip(this.txtLocalPort, "填0为自动");
+            this.txtLocalPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAutoSendms_KeyPress);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(110, 82);
+            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(11, 12);
+            this.label10.TabIndex = 2;
+            this.label10.Text = ":";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbLocalIP
+            // 
+            this.cbbLocalIP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbLocalIP.DisplayMember = "1";
+            this.cbbLocalIP.Location = new System.Drawing.Point(4, 78);
+            this.cbbLocalIP.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbLocalIP.Name = "cbbLocalIP";
+            this.cbbLocalIP.Size = new System.Drawing.Size(108, 20);
+            this.cbbLocalIP.TabIndex = 3;
+            this.cbbLocalIP.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
+            this.cbbLocalIP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
+            // 
+            // btNetOpen
+            // 
+            this.btNetOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btNetOpen.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btNetOpen.Font = new System.Drawing.Font("宋体", 10F);
+            this.btNetOpen.Image = global::ZuartControl.Properties.Resources.close;
+            this.btNetOpen.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btNetOpen.Location = new System.Drawing.Point(0, 139);
+            this.btNetOpen.Margin = new System.Windows.Forms.Padding(4);
+            this.btNetOpen.Name = "btNetOpen";
+            this.btNetOpen.Padding = new System.Windows.Forms.Padding(11, 0, 33, 0);
+            this.btNetOpen.Size = new System.Drawing.Size(162, 41);
+            this.btNetOpen.TabIndex = 9;
+            this.btNetOpen.Text = " 打开服务";
+            this.btNetOpen.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btNetOpen.UseVisualStyleBackColor = true;
+            this.btNetOpen.Click += new System.EventHandler(this.btNetOpen_Click);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(7, 100);
+            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(53, 12);
+            this.label11.TabIndex = 2;
+            this.label11.Text = "4.客户端";
+            this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // cbbClient
+            // 
+            this.cbbClient.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbClient.DisplayMember = "1";
+            this.cbbClient.Location = new System.Drawing.Point(4, 116);
+            this.cbbClient.Margin = new System.Windows.Forms.Padding(4);
+            this.cbbClient.Name = "cbbClient";
+            this.cbbClient.Size = new System.Drawing.Size(152, 20);
+            this.cbbClient.TabIndex = 3;
+            this.cbbClient.DropDown += new System.EventHandler(this.cbbLocalIP_DropDown);
+            this.cbbClient.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cbbLocalIP_KeyPress);
+            // 
             // ZuartControl
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -747,6 +932,8 @@
             this.tabControlComNet.ResumeLayout(false);
             this.tabComSetting.ResumeLayout(false);
             this.tabComSetting.PerformLayout();
+            this.tabNetSetting.ResumeLayout(false);
+            this.tabNetSetting.PerformLayout();
             this.groupboxSendSetting.ResumeLayout(false);
             this.groupboxSendSetting.PerformLayout();
             this.menuSendKey.ResumeLayout(false);
@@ -767,7 +954,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.Button btnComOpen;
         private System.Windows.Forms.GroupBox groupboxRecSetting;
         private System.Windows.Forms.CheckBox chkAutoLine;
         private System.Windows.Forms.CheckBox chkShowTime;
@@ -807,5 +994,18 @@
         private System.Windows.Forms.TabControl tabControlComNet;
         private System.Windows.Forms.TabPage tabComSetting;
         private System.Windows.Forms.TabPage tabNetSetting;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox cbbNetList;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtRemotePort;
+        private System.Windows.Forms.TextBox txtRemoteIP;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cbbLocalIP;
+        private System.Windows.Forms.TextBox txtLocalPort;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button btNetOpen;
+        private System.Windows.Forms.ComboBox cbbClient;
+        private System.Windows.Forms.Label label11;
     }
 }

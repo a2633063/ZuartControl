@@ -9,6 +9,13 @@ using TextBox = System.Windows.Forms.TextBox;
 using Button = System.Windows.Forms.Button;
 using System.Configuration;
 using RadioButton = System.Windows.Forms.RadioButton;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Data.SqlClient;
+using Timer = System.Windows.Forms.Timer;
+using System.Net.NetworkInformation;
+using System.Reflection;
 
 namespace ZuartControl
 {
@@ -239,21 +246,44 @@ namespace ZuartControl
         {
             if (iniFileName == null) iniFileName = "zuartControl.ini";
             IniPath = Path.Combine(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath), iniFileName);
+            
             #region 控件初始化
             cbbComList.Items.AddRange(SerialPort.GetPortNames());
+            cbbLocalIP_DropDown(cbbLocalIP,null);   //cbbLocalIP打开列表事件,更新ip列表
             if (this.ParentForm != null) this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
 
             System.Diagnostics.Debug.WriteLine($"init");
+
+
             #endregion
             #region 设置保存初始化
 
             IniFile ini = new IniFile(IniPath);
 
+            //串口设置
             cbbComList.Text = ini.Read("cbbComList", "COM");
             cbbBaudRate.Text = ini.Read("cbbBaudRate", "COM") ?? "115200";
             cbbDataBits.Text = ini.Read("cbbDataBits", "COM") ?? "8";
             cbbStopBits.Text = ini.Read("cbbStopBits", "COM") ?? "1";
             cbbParity.Text = ini.Read("cbbParity", "COM") ?? "None";
+
+            //网络设置
+            string localip = ini.Read("cbbLocalIP", "COM")??"";
+            if (cbbLocalIP.Items.Contains(localip))
+            {
+                cbbLocalIP.Text = localip;
+            }
+            else if (cbbLocalIP.Items.Count > 0)
+            {
+                cbbLocalIP.SelectedIndex = 0;
+            }
+
+            cbbNetList.Text = ini.Read("cbbNetList", "COM")??"UDP";
+            txtRemoteIP.Text = ini.Read("txtRemoteIP", "COM")?? cbbLocalIP.Text;
+            txtRemotePort.Text = ini.Read("txtRemotePort", "COM")??"80";
+            txtLocalPort.Text = ini.Read("txtLocalPort", "COM")??"777";
+
+
 
             if (txtSendData != null) txtSendData.Text = ini.Read("txtSendData", "COM") ?? "";
             txtAutoSendms.Text = ini.Read("txtAutoSendms", "COM") ?? "100";
@@ -281,7 +311,7 @@ namespace ZuartControl
             toolStripMenuItem3.Checked = (ini.Read("toolStripMenuItem3", "COM") ?? "").Equals("True");
             toolStripMenuItem4.Checked = (ini.Read("toolStripMenuItem4", "COM") ?? "").Equals("True");
 
-            btnOpen.Focus();
+            btnComOpen.Focus();
             #endregion
         }
         #endregion
@@ -296,6 +326,12 @@ namespace ZuartControl
             ini.Write("cbbDataBits", cbbDataBits.Text, "COM");
             ini.Write("cbbStopBits", cbbStopBits.Text, "COM");
             ini.Write("cbbParity", cbbParity.Text, "COM");
+
+            ini.Write("cbbNetList", cbbNetList.Text, "COM");
+            ini.Write("txtRemoteIP", txtRemoteIP.Text, "COM");
+            ini.Write("txtRemotePort", txtRemotePort.Text, "COM");
+            ini.Write("cbbLocalIP", cbbLocalIP.Text, "COM");
+            ini.Write("txtLocalPort", txtLocalPort.Text, "COM");
 
             if (txtSendData != null) ini.Write("txtSendData", txtSendData.Text, "COM");
             ini.Write("txtAutoSendms", txtAutoSendms.Text, "COM");
@@ -332,7 +368,7 @@ namespace ZuartControl
 
         #region 串口相关
         #region 打开串口按钮
-        private void btnOpen_Click(object sender, EventArgs e)
+        private void btnComOpen_Click(object sender, EventArgs e)
         {
             if (cbbComList.Items.Count <= 0)
             {
@@ -344,7 +380,7 @@ namespace ZuartControl
             try
             {
                 //if (ComDevice.IsOpen == false)
-                if (btnOpen.Text.Trim() == "打开串口")
+                if (btnComOpen.Text.Trim() == "打开串口")
                 {
                     ComDevice.PortName = cbbComList.Text.ToString();
                     ComDevice.BaudRate = Convert.ToInt32(cbbBaudRate.Text.ToString());
@@ -373,16 +409,16 @@ namespace ZuartControl
                         btnSend.Enabled = false;
                     chkDTR.Enabled = false;
                     chkRTS.Enabled = false;
-                    btnOpen.Text = "打开串口";
-                    btnOpen.Image = Properties.Resources.close;
+                    btnComOpen.Text = "打开串口";
+                    btnComOpen.Image = Properties.Resources.close;
                     Log("串口已关闭");
                 }
                 else
                 {
                     if (btnSend != null)
                         btnSend.Enabled = true;
-                    btnOpen.Text = "关闭串口";
-                    btnOpen.Image = Properties.Resources.open;
+                    btnComOpen.Text = "关闭串口";
+                    btnComOpen.Image = Properties.Resources.open;
                     // 串口号,波特率,数据位,停止位.校验位
                     Log("串口已开启:" + cbbComList.Text + "," + cbbBaudRate.Text + "," + cbbDataBits.Text + "," + cbbStopBits.Text + "," + cbbParity.Text);
 
@@ -415,8 +451,8 @@ namespace ZuartControl
         {
             if (ComDevice.IsOpen)
             {
-                btnOpen_Click(null, null);
-                btnOpen_Click(null, null);
+                btnComOpen_Click(null, null);
+                btnComOpen_Click(null, null);
             }
 
         }
@@ -795,11 +831,8 @@ namespace ZuartControl
         #endregion
 
         #region 接收数据监听
-        #region 串口监听
-        private void Com_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void DataReceived(byte[] ReDatas)
         {
-            byte[] ReDatas = new byte[ComDevice.BytesToRead];
-            ComDevice.Read(ReDatas, 0, ReDatas.Length);//读取数据
             this.BeginInvoke(new MethodInvoker(delegate
             {
                 RevCount += (UInt64)ReDatas.Length;
@@ -809,6 +842,13 @@ namespace ZuartControl
                 comDataReceived_EventArgs.recived_string = str;
                 if (OnComDataReceived != null) OnComDataReceived(this, comDataReceived_EventArgs);
             }));
+        }
+        #region 串口监听
+        private void Com_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            byte[] ReDatas = new byte[ComDevice.BytesToRead];
+            ComDevice.Read(ReDatas, 0, ReDatas.Length);//读取数据
+            DataReceived(ReDatas);
         } 
         #endregion
         #endregion
@@ -1073,6 +1113,16 @@ namespace ZuartControl
             rbtnSendUTF8.Checked = false;
             rbtnSendUnicode.Checked = false;
             ((RadioButton)sender).Checked = true;
+
+
+        }
+        private void rbtnSendHex_CheckedChanged(object sender, EventArgs e)
+        {
+            //若选中Hex 则转义功能无效,增加删除线
+            Font font = chkTrans.Font;
+            if (rbtnSendHex.Checked) font = new Font(font, font.Style | FontStyle.Strikeout);
+            else font = new Font(font, font.Style & ~FontStyle.Strikeout);
+            chkTrans.Font = font;
         }
         private void rbtn_Click(object sender, EventArgs e)
         {
@@ -1131,7 +1181,101 @@ namespace ZuartControl
                     tabControlComNet.SelectedTab = tabComSetting;
                 }
             }
-        } 
+        }
         #endregion
+        #region 网络相关
+
+        #region 网络控件事件相关
+        private void cbbLocalIP_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void cbbLocalIP_DropDown(object sender, EventArgs e)
+        {
+            cbbLocalIP.Items.Clear();
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in ipEntry.AddressList)
+            {
+                if (ip.AddressFamily != AddressFamily.InterNetworkV6)
+                    cbbLocalIP.Items.Add(ip.ToString());
+                Console.WriteLine("IP Address: " + ip.ToString());
+            }
+        }
+
+        private void cbbNetList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (cbbNetList.Text)
+            {
+                case "UDP":
+                    {
+                        txtRemoteIP.Enabled = true;
+                        txtRemotePort.Enabled = true;
+                        cbbClient.Enabled = true;
+                        label7.Text = "2.发送目标地址";
+                        break;
+                    }
+                case "TCP Client":
+                    {
+                        txtRemoteIP.Enabled = true;
+                        txtRemotePort.Enabled = true;
+                        cbbClient.Enabled = false;
+                        label7.Text = "2.远程主机地址";
+                        break;
+                    }
+                case "TCP Server":
+                    {
+                        txtRemoteIP.Enabled = false;
+                        txtRemotePort.Enabled = false;
+                        cbbClient.Enabled = true;
+                        label7.Text = "2.远程主机地址";
+                        break;
+                    }
+            }
+        }
+        #endregion
+
+        Thread thread_net = null; //负责监听客户端的线程
+        Socket socket = null;  //负责监听客户端的套接字     
+        private void btNetOpen_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                socket.Bind(new IPEndPoint(IPAddress.Parse(cbbLocalIP.Text), Convert.ToInt32(txtLocalPort.Text)));//绑定端口号和IP
+
+                //开启接收消息线程
+                thread_net = new Thread(ReciveMsg);
+                thread_net.IsBackground = true;
+                thread_net.Start();//启动线程
+            }
+            catch (Exception)
+            {
+                //throw;
+
+            }
+        }
+        /// <summary>
+        /// 接收发送给本机ip对应端口号的数据报
+        /// </summary>
+        private void ReciveMsg()
+        {
+            while (true)
+            {
+                EndPoint point = new IPEndPoint(IPAddress.Any, 0);//用来保存发送方的ip和端口号
+                byte[] buffer = new byte[1024];
+                int length = socket.ReceiveFrom(buffer, ref point);//接收数据报
+                byte[] reBuffer = new byte[length];
+                Array.Copy(buffer, reBuffer, length);
+                DataReceived(reBuffer);
+                string message = Encoding.UTF8.GetString(buffer, 0, length);
+                Console.WriteLine(point.ToString() + message);
+
+            }
+        }
+
+        #endregion
+
+
     }
 }
