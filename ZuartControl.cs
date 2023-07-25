@@ -153,81 +153,81 @@ namespace ZuartControl
 
         #region 自定义事件
         #region 串口开关事件回调
-        public class ComConnectState_EventArgs : EventArgs
+        public class ConnectState_EventArgs : EventArgs
         {
             public bool IsComOpen { get; set; }
+            public bool IsNetOpen { get; set; }
         }
-        protected EventHandler<ComConnectState_EventArgs> OnComConnectState;
-        [Category("控件事件"), Description("串口开关状态变化时调用"), Browsable(true)]
-        public event EventHandler<ComConnectState_EventArgs> ComConnectState
+        protected EventHandler<ConnectState_EventArgs> OnConnectState;
+        [Category("控件事件"), Description("串口/网络开关状态变化时调用"), Browsable(true)]
+        public event EventHandler<ConnectState_EventArgs> ConnectState
         {
             add
             {
-                if (OnComConnectState != null)
+                if (OnConnectState != null)
                 {
-                    foreach (Delegate d in OnComConnectState.GetInvocationList())
+                    foreach (Delegate d in OnConnectState.GetInvocationList())
                     {
                         if (object.ReferenceEquals(d, value)) return;
                     }
                 }
-                OnComConnectState = (EventHandler<ComConnectState_EventArgs>)Delegate.Combine(OnComConnectState, value);
+                OnConnectState = (EventHandler<ConnectState_EventArgs>)Delegate.Combine(OnConnectState, value);
             }
             remove
             {
-                OnComConnectState = (EventHandler<ComConnectState_EventArgs>)Delegate.Remove(OnComConnectState, value);
+                OnConnectState = (EventHandler<ConnectState_EventArgs>)Delegate.Remove(OnConnectState, value);
             }
 
         }
         #endregion
 
         #region 串口接收事件回调
-        public class ComData_EventArgs : EventArgs
+        public class Data_EventArgs : EventArgs
         {
             public byte[] data { get; set; }
             public string recived_string { get; set; }
         }
-        protected EventHandler<ComData_EventArgs> OnComDataReceived;
-        [Category("控件事件"), Description("串口接收到数据后调用"), Browsable(true)]
-        public event EventHandler<ComData_EventArgs> ComDataReceivedProperties
+        protected EventHandler<Data_EventArgs> OnDataReceived;
+        [Category("控件事件"), Description("串口接收到数据后回调"), Browsable(true)]
+        public event EventHandler<Data_EventArgs> DataReceivedProperties
         {
             add
             {
-                if (OnComDataReceived != null)
+                if (OnDataReceived != null)
                 {
-                    foreach (Delegate d in OnComDataReceived.GetInvocationList())
+                    foreach (Delegate d in OnDataReceived.GetInvocationList())
                     {
                         if (object.ReferenceEquals(d, value)) return;
                     }
                 }
-                OnComDataReceived = (EventHandler<ComData_EventArgs>)Delegate.Combine(OnComDataReceived, value);
+                OnDataReceived = (EventHandler<Data_EventArgs>)Delegate.Combine(OnDataReceived, value);
             }
             remove
             {
-                OnComDataReceived = (EventHandler<ComData_EventArgs>)Delegate.Remove(OnComDataReceived, value);
+                OnDataReceived = (EventHandler<Data_EventArgs>)Delegate.Remove(OnDataReceived, value);
             }
 
         }
         #endregion
         #region 串口发送事件回调
-
-        protected EventHandler<ComData_EventArgs> OnComDataSend;
-        [Category("控件事件"), Description("串口发送数据后调用"), Browsable(true)]
-        public event EventHandler<ComData_EventArgs> ComDataSend
+        protected EventHandler<Data_EventArgs> OnDataSend;
+        [Category("控件事件"), Description("串口发送数据后回调"), Browsable(true)]
+        public event EventHandler<Data_EventArgs> ComDataSend
         {
             add
             {
-                if (OnComDataSend != null)
+                if (OnDataSend != null)
                 {
-                    foreach (Delegate d in OnComDataSend.GetInvocationList())
+                    foreach (Delegate d in OnDataSend.GetInvocationList())
                     {
                         if (object.ReferenceEquals(d, value)) return;
                     }
                 }
-                OnComDataSend = (EventHandler<ComData_EventArgs>)Delegate.Combine(OnComDataSend, value);
+                OnDataSend = (EventHandler<Data_EventArgs>)Delegate.Combine(OnDataSend, value);
             }
             remove
             {
-                OnComDataSend = (EventHandler<ComData_EventArgs>)Delegate.Remove(OnComDataSend, value);
+                OnDataSend = (EventHandler<Data_EventArgs>)Delegate.Remove(OnDataSend, value);
             }
 
         }
@@ -471,9 +471,10 @@ namespace ZuartControl
                     ComDevice.RtsEnable = chkRTS.Checked;
                 }
 
-                ComConnectState_EventArgs comConnectState_EventArgs = new ComConnectState_EventArgs();
-                comConnectState_EventArgs.IsComOpen = ComDevice.IsOpen;
-                if (OnComConnectState != null) OnComConnectState(this, comConnectState_EventArgs);
+                ConnectState_EventArgs comConnectState_EventArgs = new ConnectState_EventArgs();
+                comConnectState_EventArgs.IsComOpen = IsComOpen;
+                comConnectState_EventArgs.IsNetOpen = IsNetOpen;
+                if (OnConnectState != null) OnConnectState(this, comConnectState_EventArgs);
             }
 
 
@@ -535,11 +536,12 @@ namespace ZuartControl
                         //ComDevice.Write(data, 0, data.Length);//发送数据
                         //SendCount += (UInt64)data.Length;
 
-                        if (OnComDataSend != null)
+                        if (OnDataSend != null)
                         {
-                            ComData_EventArgs comData_EventArgs = new ComData_EventArgs();
+                            Data_EventArgs comData_EventArgs = new Data_EventArgs();
                             comData_EventArgs.data = data;
-                            OnComDataSend(this, comData_EventArgs);
+                            comData_EventArgs.recived_string = null;
+                            OnDataSend(this, comData_EventArgs);
                         }
                         return true;
                     }
@@ -558,19 +560,46 @@ namespace ZuartControl
             {
                 if (IsNetOpen)
                 {
+                    Socket _socket= socket;
                     if (cbbNetList.Text.Equals("TCP Server"))
                     {
                         foreach (Socket s in client)
                         {
                             if(s.RemoteEndPoint.ToString().Equals($"{txtRemoteIP.Text}:{txtRemotePort.Text}"))
                             {
-                                int len=s.Send(data, data_offset, (int)data_lenght, SocketFlags.None);
-                                return len>0;
+                                _socket = s;
+                                break;
                             }
                         }
+                        if (_socket == socket)
+                        {
+                            AddContent("发送失败,客户端错误,请选择客户端\r\n");
+                            return false;
+                        }
                     }
-                    else
-                        socket.SendTo(data, data_offset, (int)data_lenght, SocketFlags.None, new IPEndPoint(IPAddress.Parse(txtRemoteIP.Text), Convert.ToInt32(txtRemotePort.Text)));
+                    IPEndPoint target = new IPEndPoint(IPAddress.Parse(txtRemoteIP.Text), Convert.ToInt32(txtRemotePort.Text));
+
+                    byte[] data_temp = new byte[_socket.SendBufferSize];
+
+                    long offect = 0;
+                    long length = data_temp.Length;
+
+                    for (offect = data_offset; offect < data.LongLength && offect < data_offset + data_lenght; offect += length)
+                    {
+                        length = data_temp.Length;
+                        if (length > data_lenght - offect) length = data_lenght - offect;
+                        Array.Copy(data, offect, data_temp, 0, length);
+                        length=_socket.SendTo(data_temp, 0, (int)length, SocketFlags.None, target);
+                        SendCount += (UInt64)length;
+                    }
+
+                    if (OnDataSend != null)
+                    {
+                        Data_EventArgs comData_EventArgs = new Data_EventArgs();
+                        comData_EventArgs.data = data;
+                        comData_EventArgs.recived_string = null;
+                        OnDataSend(this, comData_EventArgs);
+                    }
                 }
                 else
                 {
@@ -893,10 +922,10 @@ namespace ZuartControl
             {
                 RevCount += (UInt64)ReDatas.Length;
                 string str = this.AddData(ReDatas, from);//输出数据
-                ComData_EventArgs comDataReceived_EventArgs = new ComData_EventArgs();
-                comDataReceived_EventArgs.data = ReDatas;
-                comDataReceived_EventArgs.recived_string = str;
-                if (OnComDataReceived != null) OnComDataReceived(this, comDataReceived_EventArgs);
+                Data_EventArgs dataReceived_EventArgs = new Data_EventArgs();
+                dataReceived_EventArgs.data = ReDatas;
+                dataReceived_EventArgs.recived_string = str;
+                if (OnDataReceived != null) OnDataReceived(this, dataReceived_EventArgs);
             }));
         }
         #region 串口监听
@@ -1450,6 +1479,11 @@ namespace ZuartControl
                     }
                 }
 
+                ConnectState_EventArgs comConnectState_EventArgs = new ConnectState_EventArgs();
+                comConnectState_EventArgs.IsComOpen = IsComOpen;
+                comConnectState_EventArgs.IsNetOpen = IsNetOpen;
+                if (OnConnectState != null) OnConnectState(this, comConnectState_EventArgs);
+
             }
         }
 
@@ -1484,7 +1518,10 @@ namespace ZuartControl
                 catch (SocketException e)
                 {
                     //throw;
-                    if (e.ErrorCode != 0x00002714) MessageBox.Show($"网络断开:{e.Message}", "网络错误");
+                    if (e.ErrorCode == 0x00002746 && socket.ProtocolType == ProtocolType.Udp) ;
+                    else if (e.ErrorCode != 0x00002714)
+                        MessageBox.Show($"网络断开:{e.Message}", "网络错误");
+
                     break;
                 }
             }
