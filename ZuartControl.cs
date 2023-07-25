@@ -16,12 +16,30 @@ using System.Data.SqlClient;
 using Timer = System.Windows.Forms.Timer;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace ZuartControl
 {
     public partial class ZuartControl : UserControl
     {
-
+        #region 内存回收
+        [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
+        public static extern int SetProcessWorkingSetSize(IntPtr process, int minSize, int maxSize);
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        public static void ClearMemory()
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                //FrmMian为我窗体的类名
+                SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+            }
+        }
+        #endregion
 
         #region 自定义属性
         [Category("显示设置"), Description("自动换行显示开关"), Browsable(true)]
@@ -306,7 +324,7 @@ namespace ZuartControl
             txtRemotePort.Text = ini.Read("txtRemotePort", "COM") ?? "80";
             txtLocalPort.Text = ini.Read("txtLocalPort", "COM") ?? "777";
 
-
+            tabControlComNet.SelectedIndex= Convert.ToInt32(ini.Read("tabControlComNet", "COM") ?? "0");
 
             if (txtSendData != null) txtSendData.Text = ini.Read("txtSendData", "COM") ?? "";
             txtAutoSendms.Text = ini.Read("txtAutoSendms", "COM") ?? "100";
@@ -344,6 +362,8 @@ namespace ZuartControl
             System.Diagnostics.Debug.WriteLine("setting_save");
 
             IniFile ini = new IniFile(IniPath);
+
+            ini.Write("tabControlComNet", tabControlComNet.SelectedIndex.ToString(), "COM");
             ini.Write("cbbComList", cbbComList.Text, "COM");
             ini.Write("cbbBaudRate", cbbBaudRate.Text, "COM");
             ini.Write("cbbDataBits", cbbDataBits.Text, "COM");
@@ -536,7 +556,26 @@ namespace ZuartControl
             }
             else if (tabControlComNet.SelectedTab == tabNetSetting) //网络发送
             {
-
+                if (IsNetOpen)
+                {
+                    if (cbbNetList.Text.Equals("TCP Server"))
+                    {
+                        foreach (Socket s in client)
+                        {
+                            if(s.RemoteEndPoint.ToString().Equals($"{txtRemoteIP.Text}:{txtRemotePort.Text}"))
+                            {
+                                int len=s.Send(data, data_offset, (int)data_lenght, SocketFlags.None);
+                                return len>0;
+                            }
+                        }
+                    }
+                    else
+                        socket.SendTo(data, data_offset, (int)data_lenght, SocketFlags.None, new IPEndPoint(IPAddress.Parse(txtRemoteIP.Text), Convert.ToInt32(txtRemotePort.Text)));
+                }
+                else
+                {
+                    AddContent("网络通信未打开\r\n");
+                }
             }
             return false;
         }
@@ -1290,9 +1329,10 @@ namespace ZuartControl
             txtRemotePort.Text = str[1];
         }
         #endregion
-
+      
         Thread thread_net = null; //负责监听客户端的线程
         Socket socket = null;  //负责监听客户端的套接字     
+        List<Socket> client = new List<Socket>();
         private void btNetOpen_Click(object sender, EventArgs e)
         {
             try
@@ -1344,8 +1384,9 @@ namespace ZuartControl
                 else
                 {
                     socket.Close();
+                    socket.Dispose();
                     socket = null;
-
+                    ClearMemory();
                 }
             }
             catch (Exception e1)
@@ -1353,8 +1394,9 @@ namespace ZuartControl
                 //throw;
                 AddContent(e1.Message);
                 socket.Close();
+                socket.Dispose();
                 socket = null;
-
+                ClearMemory();
             }
             finally
             {
@@ -1414,6 +1456,7 @@ namespace ZuartControl
         /// <summary>
         /// 接收发送给本机ip对应端口号的数据报
         /// </summary>
+        #region NET数据接收线程
         private void ReciveMsg()
         {
             while (true)
@@ -1445,17 +1488,28 @@ namespace ZuartControl
                     break;
                 }
             }
+
+            this.BeginInvoke(new MethodInvoker(delegate
+            {
+                if (socket != null && socket.ProtocolType == ProtocolType.Tcp)
+                {
+                    if (btNetOpen.Text.Contains("关闭"))
+                    {
+                        btNetOpen_Click(null, null);
+                    }
+                }
+            }));
         }
         private void ReciveMsgTcpServer()
         {
             //if (!IsNetOpen) return;
-
+            Socket client = null;
             try
             {
                 Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]线程启动");
-                
-                Socket client = socket.Accept();//开始监听
 
+                client = socket.Accept();//开始监听
+                this.client.Add(client);
                 Console.WriteLine($"客户端连接 {client.RemoteEndPoint}");
                 this.BeginInvoke(new MethodInvoker(delegate
                 {
@@ -1470,7 +1524,7 @@ namespace ZuartControl
                     Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]开始监听数据 {client.Poll(10, SelectMode.SelectRead)}");
                     try
                     {
-                        if(client.Poll(1000, SelectMode.SelectRead) && client.Available == 0)
+                        if (client.Poll(1000, SelectMode.SelectRead) && client.Available == 0)
                         {
                             break;
                         }
@@ -1493,16 +1547,19 @@ namespace ZuartControl
                     if ((String)(cbbClient.SelectedItem) == client.RemoteEndPoint.ToString()) cbbClient.SelectedIndex = cbbClient.SelectedIndex - 1;
                     if (cbbClient.Items.Contains(client.RemoteEndPoint.ToString())) cbbClient.Items.Remove(client.RemoteEndPoint.ToString());
                 }));
+                this.client.Remove(client);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]错误:{e.Message}");
-                throw;
+                //throw;
             }
+
 
             Console.WriteLine($"[{Thread.CurrentThread.ManagedThreadId}]设备断开,接收监听线程退出");
         }
 
+        #endregion
         #endregion
 
 
