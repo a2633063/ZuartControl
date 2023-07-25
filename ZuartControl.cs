@@ -272,28 +272,36 @@ namespace ZuartControl
 
         public ZuartControl()
         {
-            System.Diagnostics.Debug.WriteLine("ZuartControl");
+            Console.WriteLine("ZuartControl");
             InitializeComponent();
+        }
+
+        private void ZuartControl_Load(object sender, EventArgs e)
+        {
             init();
             RevCount = 0;
             SendCount = 0;
+            if (this.ParentForm != null)
+            {
+                this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
+            }
         }
-
-
 
         #region 初始化
 
         private void init()
         {
+            Console.WriteLine($"INIFileName: {iniFileName}");
             if (iniFileName == null) iniFileName = "zuartControl.ini";
             IniPath = Path.Combine(Path.GetDirectoryName(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath), iniFileName);
 
+            Console.WriteLine($"IniPath: {IniPath}");
             #region 控件初始化
             cbbComList.Items.AddRange(SerialPort.GetPortNames());
             cbbLocalIP_DropDown(cbbLocalIP, null);   //cbbLocalIP打开列表事件,更新ip列表
             if (this.ParentForm != null) this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
 
-            System.Diagnostics.Debug.WriteLine($"init");
+            Console.WriteLine($"init");
 
 
             #endregion
@@ -324,7 +332,7 @@ namespace ZuartControl
             txtRemotePort.Text = ini.Read("txtRemotePort", "COM") ?? "80";
             txtLocalPort.Text = ini.Read("txtLocalPort", "COM") ?? "777";
 
-            tabControlComNet.SelectedIndex= Convert.ToInt32(ini.Read("tabControlComNet", "COM") ?? "0");
+            tabControlComNet.SelectedIndex = Convert.ToInt32(ini.Read("tabControlComNet", "COM") ?? "0");
 
             if (txtSendData != null) txtSendData.Text = ini.Read("txtSendData", "COM") ?? "";
             txtAutoSendms.Text = ini.Read("txtAutoSendms", "COM") ?? "100";
@@ -359,9 +367,10 @@ namespace ZuartControl
 
         public void setting_save(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("setting_save");
+            Console.WriteLine("setting_save");
 
             IniFile ini = new IniFile(IniPath);
+            Console.WriteLine($"IniPath: {IniPath}");
 
             ini.Write("tabControlComNet", tabControlComNet.SelectedIndex.ToString(), "COM");
             ini.Write("cbbComList", cbbComList.Text, "COM");
@@ -560,12 +569,12 @@ namespace ZuartControl
             {
                 if (IsNetOpen)
                 {
-                    Socket _socket= socket;
+                    Socket _socket = socket;
                     if (cbbNetList.Text.Equals("TCP Server"))
                     {
                         foreach (Socket s in client)
                         {
-                            if(s.RemoteEndPoint.ToString().Equals($"{txtRemoteIP.Text}:{txtRemotePort.Text}"))
+                            if (s.RemoteEndPoint.ToString().Equals($"{txtRemoteIP.Text}:{txtRemotePort.Text}"))
                             {
                                 _socket = s;
                                 break;
@@ -589,7 +598,7 @@ namespace ZuartControl
                         length = data_temp.Length;
                         if (length > data_lenght - offect) length = data_lenght - offect;
                         Array.Copy(data, offect, data_temp, 0, length);
-                        length=_socket.SendTo(data_temp, 0, (int)length, SocketFlags.None, target);
+                        length = _socket.SendTo(data_temp, 0, (int)length, SocketFlags.None, target);
                         SendCount += (UInt64)length;
                     }
 
@@ -1250,17 +1259,6 @@ namespace ZuartControl
         }
         #endregion
 
-        #region 增加退出事件,退出时保存设置
-        private void timerDelay_Tick(object sender, EventArgs e)
-        {
-            if (this.ParentForm != null)
-            {
-                ((Timer)sender).Enabled = false;
-                this.ParentForm.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.setting_save);
-            }
-        }
-        #endregion
-
         #region 串口/网络界面事件监听
         private void tabControlComNet_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1358,7 +1356,7 @@ namespace ZuartControl
             txtRemotePort.Text = str[1];
         }
         #endregion
-      
+
         Thread thread_net = null; //负责监听客户端的线程
         Socket socket = null;  //负责监听客户端的套接字     
         List<Socket> client = new List<Socket>();
@@ -1597,6 +1595,7 @@ namespace ZuartControl
         }
 
         #endregion
+
         #endregion
 
 

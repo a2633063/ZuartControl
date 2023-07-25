@@ -29,7 +29,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.panel_Setting = new System.Windows.Forms.Panel();
             this.groupboxRecSetting = new System.Windows.Forms.GroupBox();
             this.chkIsShow = new System.Windows.Forms.CheckBox();
@@ -85,15 +84,14 @@
             this.rbtnSendUTF8 = new System.Windows.Forms.RadioButton();
             this.lkbSendKey = new System.Windows.Forms.LinkLabel();
             this.lkbClearSend = new System.Windows.Forms.LinkLabel();
-            this.ComDevice = new System.IO.Ports.SerialPort(this.components);
-            this.timerAutoSend = new System.Windows.Forms.Timer(this.components);
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.menuSendKey = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ComDevice = new System.IO.Ports.SerialPort();
+            this.timerAutoSend = new System.Windows.Forms.Timer();
+            this.toolTip1 = new System.Windows.Forms.ToolTip();
+            this.menuSendKey = new System.Windows.Forms.ContextMenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.timerDelay = new System.Windows.Forms.Timer(this.components);
             this.panel_Setting.SuspendLayout();
             this.groupboxRecSetting.SuspendLayout();
             this.tabControlComNet.SuspendLayout();
@@ -917,11 +915,6 @@
             this.toolStripMenuItem4.CheckStateChanged += new System.EventHandler(this.toolStripMenuItem_CheckStateChanged);
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
-            // timerDelay
-            // 
-            this.timerDelay.Enabled = true;
-            this.timerDelay.Tick += new System.EventHandler(this.timerDelay_Tick);
-            // 
             // ZuartControl
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -929,6 +922,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ZuartControl";
             this.Size = new System.Drawing.Size(161, 579);
+            this.Load += new System.EventHandler(this.ZuartControl_Load);
             this.panel_Setting.ResumeLayout(false);
             this.groupboxRecSetting.ResumeLayout(false);
             this.groupboxRecSetting.PerformLayout();
@@ -993,7 +987,6 @@
         public System.Windows.Forms.RadioButton rbtnSendUTF8;
         public System.Windows.Forms.TextBox txtAutoSendms;
         private System.Windows.Forms.CheckBox chkIsShow;
-        private System.Windows.Forms.Timer timerDelay;
         private System.Windows.Forms.TabControl tabControlComNet;
         private System.Windows.Forms.TabPage tabComSetting;
         private System.Windows.Forms.TabPage tabNetSetting;
